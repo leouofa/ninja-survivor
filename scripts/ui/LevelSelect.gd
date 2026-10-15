@@ -1,11 +1,14 @@
 extends Control
 
+const UIThemeHelper = preload("res://scripts/ui/UIThemeHelper.gd")
+
 @onready var tracks_container: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/TracksVBox
 @onready var back_btn: Button = $MarginContainer/VBoxContainer/TopBar/BackBtn
 @onready var now_playing_label: Label = $MarginContainer/VBoxContainer/BottomBar/NowPlayingLabel
 
 func _ready() -> void:
 	back_btn.pressed.connect(_on_back_pressed)
+	UIThemeHelper.apply_synthwave_button_style(back_btn, UIThemeHelper.COLOR_CYAN)
 	_populate_tracks()
 
 func _populate_tracks() -> void:
@@ -85,6 +88,7 @@ func _create_track_row(index: int, track: Dictionary, unlocked: bool, stats: Dic
 		var preview_btn = Button.new()
 		preview_btn.text = "♫ PREVIEW"
 		preview_btn.custom_minimum_size = Vector2(100, 36)
+		UIThemeHelper.apply_synthwave_button_style(preview_btn, UIThemeHelper.COLOR_MAGENTA)
 		preview_btn.pressed.connect(func():
 			AudioManager.play_track(track["path"])
 			now_playing_label.text = "PREVIEWING: " + track["title"]
@@ -95,10 +99,7 @@ func _create_track_row(index: int, track: Dictionary, unlocked: bool, stats: Dic
 		var play_btn = Button.new()
 		play_btn.text = "LAUNCH RUN"
 		play_btn.custom_minimum_size = Vector2(140, 36)
-		var btn_style = StyleBoxFlat.new()
-		btn_style.bg_color = Color(0, 0.7, 0.9, 0.9)
-		btn_style.set_corner_radius_all(4)
-		play_btn.add_theme_stylebox_override("normal", btn_style)
+		UIThemeHelper.apply_synthwave_button_style(play_btn, UIThemeHelper.COLOR_CYAN)
 		play_btn.pressed.connect(func():
 			GameManager.start_run(track)
 		)

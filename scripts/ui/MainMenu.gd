@@ -1,5 +1,7 @@
 extends Control
 
+const UIThemeHelper = preload("res://scripts/ui/UIThemeHelper.gd")
+
 @onready var start_btn: Button = $CenterContainer/VBoxContainer/VBoxButtons/StartBtn
 @onready var select_btn: Button = $CenterContainer/VBoxContainer/VBoxButtons/SelectBtn
 @onready var quit_btn: Button = $CenterContainer/VBoxContainer/VBoxButtons/QuitBtn
@@ -8,6 +10,9 @@ func _ready() -> void:
 	start_btn.pressed.connect(_on_start_pressed)
 	select_btn.pressed.connect(_on_select_pressed)
 	quit_btn.pressed.connect(_on_quit_pressed)
+	UIThemeHelper.apply_synthwave_button_style(start_btn, UIThemeHelper.COLOR_CYAN)
+	UIThemeHelper.apply_synthwave_button_style(select_btn, UIThemeHelper.COLOR_MAGENTA)
+	UIThemeHelper.apply_synthwave_button_style(quit_btn, UIThemeHelper.COLOR_PURPLE)
 	
 	# Start ambient title synth music if not playing
 	if not AudioManager.music_player.playing:

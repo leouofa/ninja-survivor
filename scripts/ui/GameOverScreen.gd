@@ -1,5 +1,7 @@
 extends CanvasLayer
 
+const UIThemeHelper = preload("res://scripts/ui/UIThemeHelper.gd")
+
 @onready var track_label: Label = $CenterContainer/VBoxContainer/TrackNameLabel
 @onready var stats_label: Label = $CenterContainer/VBoxContainer/StatsLabel
 @onready var retry_btn: Button = $CenterContainer/VBoxContainer/HBoxContainer/RetryBtn
@@ -10,6 +12,8 @@ func _ready() -> void:
 	visible = false
 	retry_btn.pressed.connect(_on_retry_pressed)
 	select_btn.pressed.connect(_on_select_pressed)
+	UIThemeHelper.apply_synthwave_button_style(retry_btn, UIThemeHelper.COLOR_MAGENTA)
+	UIThemeHelper.apply_synthwave_button_style(select_btn, UIThemeHelper.COLOR_CYAN)
 
 func show_game_over(track_title: String, survival_time: float, kills: int) -> void:
 	get_tree().paused = true

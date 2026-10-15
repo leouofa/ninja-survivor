@@ -251,6 +251,18 @@ func _get_or_create_sfx_stream(sfx_type: String) -> AudioStreamWAV:
 				var val = sin(t * freq * TAU) * env * 0.55
 				samples[i] = int(clamp((val + 1.0) * 127.5, 0, 255))
 		
+		"ui_hover":
+			# Crisp, high-tech synth hover blip
+			duration = 0.045
+			var num_samples = int(sample_rate * duration)
+			samples.resize(num_samples)
+			for i in range(num_samples):
+				var t = float(i) / sample_rate
+				var freq = 900.0 + (t / duration) * 600.0
+				var env = pow(1.0 - (float(i) / num_samples), 1.5)
+				var val = sin(t * freq * TAU) * env * 0.18
+				samples[i] = int(clamp((val + 1.0) * 127.5, 0, 255))
+		
 		_:
 			duration = 0.1
 			var num_samples = int(sample_rate * duration)
