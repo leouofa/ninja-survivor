@@ -231,7 +231,7 @@ func _setup_shader_material(track_info: Dictionary) -> void:
 	floor_material.set_shader_parameter("secondary_color", col_secondary)
 	floor_material.set_shader_parameter("ambient_color", col_ambient)
 	floor_material.set_shader_parameter("voronoi_scale", voronoi_scale)
-	floor_material.set_shader_parameter("emission_energy", 2.5)
+	floor_material.set_shader_parameter("emission_energy", 1.0)
 	floor_material.set_shader_parameter("live_amplitude", 0.0)
 	
 	mesh_instance.material_override = floor_material

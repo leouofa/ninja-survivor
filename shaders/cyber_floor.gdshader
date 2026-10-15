@@ -8,7 +8,7 @@ uniform vec4 ambient_color : source_color = vec4(0.04, 0.03, 0.08, 1.0);
 
 uniform float voronoi_scale : hint_range(0.01, 0.2) = 0.05;
 uniform float live_amplitude : hint_range(0.0, 1.0) = 0.0;
-uniform float emission_energy : hint_range(0.5, 6.0) = 2.8;
+uniform float emission_energy : hint_range(0.1, 5.0) = 1.0;
 uniform float panel_metallic : hint_range(0.0, 1.0) = 0.25;
 uniform float panel_roughness : hint_range(0.0, 1.0) = 0.45;
 
@@ -97,22 +97,22 @@ void fragment() {
 	ROUGHNESS = mix(panel_roughness, 0.15, max(border, grid_lines));
 
 	// Audio-reactive emission modulation
-	float pulse = live_amplitude * 2.0;
+	float pulse = live_amplitude * 1.2;
 
 	// 1. Glowing Voronoi Seams
-	vec3 seam_emission = primary_color.rgb * border * (0.8 + pulse * 2.0);
+	vec3 seam_emission = primary_color.rgb * border * (0.6 + pulse * 1.0);
 
 	// 2. Subtle Synthwave Grid Glow
-	vec3 grid_emission = primary_color.rgb * grid_lines * (0.35 + pulse * 0.8);
+	vec3 grid_emission = primary_color.rgb * grid_lines * (0.2 + pulse * 0.4);
 
 	// 3. Central Combat Ring Glow
-	vec3 ring_emission = primary_color.rgb * center_ring * (1.2 + pulse * 1.5);
+	vec3 ring_emission = primary_color.rgb * center_ring * (0.7 + pulse * 0.8);
 
 	// 4. Glowing Topographic Contour Lines on Hills
-	vec3 contour_emission = secondary_color.rgb * contour * (0.7 + pulse * 1.4);
+	vec3 contour_emission = secondary_color.rgb * contour * (0.5 + pulse * 0.8);
 
 	// 5. Beat Ripple Waves
-	vec3 ripple_emission = secondary_color.rgb * beat_ripple * (0.3 + pulse * 1.0);
+	vec3 ripple_emission = secondary_color.rgb * beat_ripple * (0.2 + pulse * 0.6);
 
 	EMISSION = (seam_emission + grid_emission + ring_emission + contour_emission + ripple_emission) * emission_energy;
 }
