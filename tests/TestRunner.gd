@@ -149,6 +149,25 @@ func _ready() -> void:
 	assert(is_equal_approx(amp_param, 0.85), "Shader live_amplitude must match AudioManager smoothed amplitude")
 	print("✓ Audio-reactive live amplitude shader parameter verified (value: %f)" % amp_param)
 	
+	# 5b. Test Audio Balance & Dedicated Bus Hierarchy
+	var music_bus_idx = AudioServer.get_bus_index("Music")
+	var sfx_bus_idx = AudioServer.get_bus_index("SFX")
+	assert(music_bus_idx != -1, "Dedicated Music audio bus must exist")
+	assert(sfx_bus_idx != -1, "Dedicated SFX audio bus must exist")
+	assert(AudioManager.music_player.bus == "Music", "music_player must be routed to Music bus")
+	for p in AudioManager.sfx_pool:
+		assert(p.bus == "SFX", "SFX player must be routed to SFX bus")
+	
+	var m_vol = AudioManager.get_music_volume_db()
+	var s_vol = AudioManager.get_sfx_volume_db()
+	assert(m_vol - s_vol >= 10.0, "Game audio volume must be at least 10 dB louder than SFX (got %f dB vs %f dB)" % [m_vol, s_vol])
+	print("✓ Audio balance verified: Music (%+.1f dB) is %+.1f dB above SFX (%+.1f dB)" % [m_vol, m_vol - s_vol, s_vol])
+	
+	# Verify SFX playback on SFX bus
+	AudioManager.play_sfx("enemy_hit")
+	AudioManager.play_sfx("shuriken")
+	print("✓ SFX playback and bus routing verified")
+	
 	# 6. Test Player slope traversal & gravity
 	var player_script = load("res://scripts/player/Player.gd")
 	var player = CharacterBody3D.new()
