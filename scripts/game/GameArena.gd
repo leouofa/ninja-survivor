@@ -7,6 +7,7 @@ extends Node3D
 @onready var level_up_screen: CanvasLayer = $LevelUpScreen
 @onready var victory_screen: CanvasLayer = $VictoryScreen
 @onready var game_over_screen: CanvasLayer = $GameOverScreen
+@onready var pause_menu: CanvasLayer = $PauseMenu
 
 var run_time: float = 0.0
 
@@ -40,7 +41,8 @@ func _process(delta: float) -> void:
 	
 	# Escape / Pause
 	if Input.is_action_just_pressed("pause") and not level_up_screen.visible and not victory_screen.visible and not game_over_screen.visible:
-		get_tree().paused = not get_tree().paused
+		var title = GameManager.current_track_info.get("title", "Mission")
+		pause_menu.open_pause_menu(title, run_time, GameManager.player_kills)
 
 func _on_player_leveled_up(_new_lvl: int) -> void:
 	level_up_screen.show_level_up(player)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://game_arena_01"]
+[gd_scene load_steps=17 format=3 uid="uid://game_arena_01"]
 
 [ext_resource type="Script" path="res://scripts/game/GameArena.gd" id="1_arena"]
 [ext_resource type="PackedScene" uid="uid://player_ninja_01" path="res://scenes/player/Player.tscn" id="2_player"]
@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://gameover_screen_01" path="res://scenes/ui/GameOverScreen.tscn" id="8_gameover"]
 [ext_resource type="PackedScene" path="res://assets/models/prop_torii_gate.glb" id="9_torii"]
 [ext_resource type="Script" path="res://scripts/environment/ProceduralFloor.gd" id="10_floor"]
+[ext_resource type="PackedScene" uid="uid://pause_menu_01" path="res://scenes/ui/PauseMenu.tscn" id="11_pause"]
 
 [sub_resource type="Environment" id="Environment_synthwave"]
 background_mode = 1
@@ -102,3 +103,5 @@ transform = Transform3D(-8.74228e-08, 0, -2, 0, 2, 0, 2, 0, -8.74228e-08, -45, 0
 [node name="VictoryScreen" parent="." instance=ExtResource("7_victory")]
 
 [node name="GameOverScreen" parent="." instance=ExtResource("8_gameover")]
+
+[node name="PauseMenu" parent="." instance=ExtResource("11_pause")]

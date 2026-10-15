@@ -295,6 +295,10 @@ func _ready() -> void:
 	# Verify enemy spawn boundary confinement
 	var spawner = arena.get_node("EnemySpawner")
 	assert(spawner != null, "EnemySpawner must exist")
+	# Clear any previous enemies from opening wave before testing spawn clamping
+	for e in get_tree().get_nodes_in_group("enemies"):
+		e.queue_free()
+	await get_tree().process_frame
 	# Force spawn an enemy when player is at edge
 	arena_player.global_position = Vector3(78.0, 0.0, 78.0)
 	for i in range(10):
@@ -406,12 +410,97 @@ func _ready() -> void:
 	assert("95" in go_hs_label.text, "GameOverScreen must show record of 95 kills")
 	assert("-65" in go_hs_label.text, "GameOverScreen must show negative delta (-65 kills)")
 	game_over_scr.queue_free()
+	get_tree().paused = false
 	print("✓ GameOverScreen high score comparison verified (%s)" % go_hs_label.text)
 	
 	# Restore backed up state
 	GameManager.high_scores = backup_scores
 	GameManager.unlocked_tracks = backup_unlocked
 	GameManager.save_game_data()
+
+	print("\n--- BEGIN TEST: In-Game Pause Menu ---")
+	
+	# 1. Test PauseMenu loading, instantiation, and process_mode
+	var pause_scene = load("res://scenes/ui/PauseMenu.tscn")
+	assert(pause_scene != null, "PauseMenu.tscn failed to load")
+	var pause_menu = pause_scene.instantiate()
+	assert(pause_menu != null, "PauseMenu failed to instantiate")
+	assert(pause_menu.process_mode == Node.PROCESS_MODE_ALWAYS, "PauseMenu must have PROCESS_MODE_ALWAYS")
+	add_child(pause_menu)
+	
+	assert(pause_menu.visible == false, "PauseMenu should be hidden initially")
+	assert(get_tree().paused == false, "SceneTree should not be paused initially")
+	
+	# 2. Test opening pause menu
+	pause_menu.open_pause_menu("Neo Tokyo", 135.0, 52)
+	assert(pause_menu.visible == true, "PauseMenu should be visible when opened")
+	assert(get_tree().paused == true, "SceneTree must be paused when PauseMenu is open")
+	assert(AudioManager.music_player.stream_paused == true, "Music stream must be paused")
+	assert("NEO TOKYO" in pause_menu.track_label.text, "Track label must show track name")
+	assert("02:15" in pause_menu.stats_label.text, "Stats label must show formatted time 02:15")
+	assert("52" in pause_menu.stats_label.text, "Stats label must show 52 kills")
+	assert(pause_menu.main_buttons_vbox.visible == true, "Main buttons must be visible")
+	assert(pause_menu.confirm_vbox.visible == false, "Confirm VBox should be hidden")
+	print("✓ PauseMenu open, tree pause state, stats, and audio pause verified")
+	
+	# 3. Test Restart Level confirmation flow
+	pause_menu._on_restart_pressed()
+	assert(pause_menu.main_buttons_vbox.visible == false, "Main buttons must be hidden during confirmation")
+	assert(pause_menu.confirm_vbox.visible == true, "Confirm VBox must be visible")
+	assert(pause_menu.pending_action == pause_menu.PendingAction.RESTART, "Pending action must be RESTART")
+	assert("Restart level" in pause_menu.confirm_prompt_label.text, "Prompt should mention restart")
+	
+	# Test canceling restart
+	pause_menu._on_cancel_pressed()
+	assert(pause_menu.main_buttons_vbox.visible == true, "Main buttons must reappear after cancel")
+	assert(pause_menu.confirm_vbox.visible == false, "Confirm VBox must be hidden after cancel")
+	assert(pause_menu.pending_action == pause_menu.PendingAction.NONE, "Pending action must reset to NONE")
+	assert(get_tree().paused == true, "SceneTree must remain paused after canceling restart")
+	print("✓ PauseMenu Restart confirmation & cancellation verified")
+	
+	# 4. Test Main Menu confirmation flow
+	pause_menu._on_main_menu_pressed()
+	assert(pause_menu.main_buttons_vbox.visible == false, "Main buttons must be hidden during confirmation")
+	assert(pause_menu.confirm_vbox.visible == true, "Confirm VBox must be visible")
+	assert(pause_menu.pending_action == pause_menu.PendingAction.MAIN_MENU, "Pending action must be MAIN_MENU")
+	assert("Main Menu" in pause_menu.confirm_prompt_label.text, "Prompt should mention Main Menu")
+	
+	# Test canceling via pause input action
+	var ev_cancel = InputEventAction.new()
+	ev_cancel.action = "pause"
+	ev_cancel.pressed = true
+	pause_menu._unhandled_input(ev_cancel)
+	assert(pause_menu.main_buttons_vbox.visible == true, "ESC on confirm screen should cancel back to main buttons")
+	assert(pause_menu.confirm_vbox.visible == false, "Confirm VBox must be hidden after ESC cancel")
+	print("✓ PauseMenu Main Menu confirmation & ESC cancel verified")
+	
+	# 5. Test ESC unpausing
+	var ev_unpause = InputEventAction.new()
+	ev_unpause.action = "pause"
+	ev_unpause.pressed = true
+	pause_menu._unhandled_input(ev_unpause)
+	assert(pause_menu.visible == false, "ESC on main buttons should close pause menu")
+	assert(get_tree().paused == false, "SceneTree must be unpaused after ESC close")
+	assert(AudioManager.music_player.stream_paused == false, "Music stream must resume after unpause")
+	print("✓ PauseMenu ESC toggle unpausing & music resume verified")
+	
+	# 6. Test Resume button
+	pause_menu.open_pause_menu("Neo Tokyo", 60.0, 10)
+	assert(pause_menu.visible == true, "Pause menu reopened")
+	pause_menu._on_resume_pressed()
+	assert(pause_menu.visible == false, "Resume button should close pause menu")
+	assert(get_tree().paused == false, "SceneTree must be unpaused after Resume button")
+	print("✓ PauseMenu Resume button verified")
+	
+	# 7. Test GameArena scene integration
+	var arena_packed = load("res://scenes/game/GameArena.tscn")
+	var arena_inst = arena_packed.instantiate()
+	assert(arena_inst.has_node("PauseMenu"), "GameArena must contain PauseMenu child node")
+	assert(arena_inst.get_node("PauseMenu") is CanvasLayer, "PauseMenu in GameArena must be a CanvasLayer")
+	arena_inst.queue_free()
+	print("✓ GameArena scene PauseMenu integration verified")
+	
+	pause_menu.queue_free()
 	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)
