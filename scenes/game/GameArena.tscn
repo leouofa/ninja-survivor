@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://game_arena_01"]
+[gd_scene load_steps=16 format=3 uid="uid://game_arena_01"]
 
 [ext_resource type="Script" path="res://scripts/game/GameArena.gd" id="1_arena"]
 [ext_resource type="PackedScene" uid="uid://player_ninja_01" path="res://scenes/player/Player.tscn" id="2_player"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://victory_screen_01" path="res://scenes/ui/VictoryScreen.tscn" id="7_victory"]
 [ext_resource type="PackedScene" uid="uid://gameover_screen_01" path="res://scenes/ui/GameOverScreen.tscn" id="8_gameover"]
 [ext_resource type="PackedScene" path="res://assets/models/prop_torii_gate.glb" id="9_torii"]
+[ext_resource type="Script" path="res://scripts/environment/ProceduralFloor.gd" id="10_floor"]
 
 [sub_resource type="Environment" id="Environment_synthwave"]
 background_mode = 1
@@ -18,13 +19,13 @@ ambient_light_color = Color(0.12, 0.08, 0.22, 1)
 ambient_light_energy = 1.2
 tonemap_mode = 3
 glow_enabled = true
-glow_levels/1 = 1.0
-glow_levels/2 = 1.0
-glow_levels/3 = 1.0
-glow_levels/5 = 0.5
-glow_intensity = 0.8
-glow_strength = 1.1
-glow_bloom = 0.2
+glow_levels/1 = 0.4
+glow_levels/2 = 0.5
+glow_levels/3 = 0.8
+glow_levels/5 = 0.4
+glow_intensity = 0.35
+glow_strength = 0.95
+glow_bloom = 0.05
 glow_blend_mode = 1
 fog_enabled = true
 fog_light_color = Color(0.08, 0.03, 0.15, 1)
@@ -61,6 +62,7 @@ shadow_enabled = true
 [node name="Ground" type="StaticBody3D" parent="."]
 collision_layer = 1
 collision_mask = 0
+script = ExtResource("10_floor")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
 mesh = SubResource("PlaneMesh_arena")

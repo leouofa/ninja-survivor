@@ -7,7 +7,7 @@ var enemy_base_script = preload("res://scripts/enemies/BaseEnemy.gd")
 
 var spawn_timer: float = 0.0
 var base_spawn_interval: float = 1.4
-var spawn_radius: float = 24.0
+var spawn_radius: float = 18.0
 
 var boss_has_spawned: bool = false
 var stage_finished: bool = false
@@ -16,9 +16,32 @@ var player: CharacterBody3D
 
 func _ready() -> void:
 	AudioManager.music_finished.connect(_on_music_finished)
+	_get_valid_player()
+	call_deferred("_spawn_opening_wave")
+
+const SPAWN_BOUNDARY_LIMIT: float = 74.0
+
+func _get_valid_player() -> CharacterBody3D:
+	if is_instance_valid(player) and not player.is_queued_for_deletion():
+		return player
 	var players = get_tree().get_nodes_in_group("player")
-	if not players.is_empty():
-		player = players[0]
+	for p in players:
+		if is_instance_valid(p) and not p.is_queued_for_deletion():
+			player = p
+			return player
+	return null
+
+func _spawn_opening_wave() -> void:
+	var p = _get_valid_player()
+	if p == null:
+		return
+	for i in range(4):
+		var angle = float(i) * (TAU / 4.0) + randf_range(-0.2, 0.2)
+		var spawn_pos = p.global_position + Vector3(cos(angle), 0, sin(angle)) * 13.0
+		spawn_pos.x = clamp(spawn_pos.x, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+		spawn_pos.z = clamp(spawn_pos.z, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+		spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
+		_spawn_enemy_at("ronin", spawn_pos)
 
 func _process(delta: float) -> void:
 	if stage_finished:
@@ -70,11 +93,29 @@ func _select_enemy_type(progress: float) -> String:
 		elif roll < 0.8: return "kitsune"
 		else: return "ronin"
 
+var floor_node: Node = null
+
+func _get_ground_height(x: float, z: float) -> float:
+	if floor_node == null:
+		var floors = get_tree().get_nodes_in_group("procedural_floor")
+		if not floors.is_empty():
+			floor_node = floors[0]
+	if floor_node != null:
+		return floor_node.get_height_at(x, z)
+	return 0.0
+
 func _spawn_enemy(type: String) -> void:
+	var p = _get_valid_player()
+	if p == null:
+		return
 	var angle = randf() * TAU
-	var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * spawn_radius
-	spawn_pos.y = 0.0
-	
+	var spawn_pos = p.global_position + Vector3(cos(angle), 0, sin(angle)) * spawn_radius
+	spawn_pos.x = clamp(spawn_pos.x, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+	spawn_pos.z = clamp(spawn_pos.z, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+	spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
+	_spawn_enemy_at(type, spawn_pos)
+
+func _spawn_enemy_at(type: String, spawn_pos: Vector3) -> void:
 	var enemy = CharacterBody3D.new()
 	enemy.set_script(enemy_base_script)
 	enemy.enemy_type = type
@@ -124,13 +165,18 @@ func _spawn_enemy(type: String) -> void:
 	enemy.global_position = spawn_pos
 
 func _spawn_boss() -> void:
+	var p = _get_valid_player()
+	if p == null:
+		return
 	boss_has_spawned = true
 	boss_spawned.emit()
 	AudioManager.play_sfx("boss_spawn", 1.0)
 	
 	var angle = randf() * TAU
-	var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * (spawn_radius * 0.9)
-	spawn_pos.y = 0.0
+	var spawn_pos = p.global_position + Vector3(cos(angle), 0, sin(angle)) * (spawn_radius * 0.9)
+	spawn_pos.x = clamp(spawn_pos.x, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+	spawn_pos.z = clamp(spawn_pos.z, -SPAWN_BOUNDARY_LIMIT, SPAWN_BOUNDARY_LIMIT)
+	spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
 	
 	var boss = CharacterBody3D.new()
 	boss.set_script(enemy_base_script)

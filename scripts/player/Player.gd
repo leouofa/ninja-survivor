@@ -45,6 +45,9 @@ func _ready() -> void:
 	add_to_group("player")
 	health = max_health
 	current_speed = base_speed
+	floor_snap_length = 0.5
+	floor_max_angle = deg_to_rad(55.0)
+	collision_mask = collision_mask | 1 | 2
 	
 	# Visual model
 	visual_node = Node3D.new()
@@ -72,6 +75,8 @@ func _ready() -> void:
 	hp_changed.emit(health, max_health)
 	xp_updated.emit(current_xp, xp_needed, current_level)
 
+const GRAVITY: float = 24.0
+
 func _physics_process(delta: float) -> void:
 	# Passive Regen
 	if health_regen > 0.0 and health < max_health:
@@ -82,13 +87,23 @@ func _physics_process(delta: float) -> void:
 	if dash_cooldown_timer > 0.0:
 		dash_cooldown_timer -= delta
 	
+	# Gravity & floor stick
+	if not is_on_floor():
+		velocity.y = max(velocity.y - GRAVITY * delta, -25.0)
+	else:
+		velocity.y = -0.5
+	
 	if is_dashing:
 		dash_timer -= delta
 		if dash_timer <= 0.0:
 			is_dashing = false
 			is_invulnerable = false
+		var y_vel = velocity.y
 		velocity = last_movement_dir * dash_speed
+		velocity.y = y_vel
 		move_and_slide()
+		_enforce_map_bounds()
+		_enforce_ground_height()
 		return
 	
 	# Normal movement
@@ -99,13 +114,13 @@ func _physics_process(delta: float) -> void:
 	if input_vec.length_squared() > 1.0:
 		input_vec = input_vec.normalized()
 	
-	# Isometric 3D projection: W is (-Z, -X/2), S is (+Z, +X/2), etc.
-	# Standard top-down: X is left/right, Z is up/down
 	var move_dir = Vector3(input_vec.x, 0, input_vec.y).normalized()
+	var y_vel = velocity.y
 	
 	if move_dir.length_squared() > 0.01:
 		last_movement_dir = move_dir
 		velocity = move_dir * current_speed
+		velocity.y = y_vel
 		
 		# Rotate visual model smoothly toward movement
 		var target_rot = atan2(move_dir.x, move_dir.z)
@@ -114,7 +129,11 @@ func _physics_process(delta: float) -> void:
 		# Subtle forward lean
 		visual_node.rotation.x = lerp(visual_node.rotation.x, deg_to_rad(12.0), 10.0 * delta)
 	else:
-		velocity = velocity.move_toward(Vector3.ZERO, current_speed * 12.0 * delta)
+		var current_h = Vector3(velocity.x, 0.0, velocity.z)
+		current_h = current_h.move_toward(Vector3.ZERO, current_speed * 12.0 * delta)
+		velocity.x = current_h.x
+		velocity.z = current_h.z
+		velocity.y = y_vel
 		visual_node.rotation.x = lerp(visual_node.rotation.x, 0.0, 10.0 * delta)
 	
 	# Dash Trigger
@@ -122,6 +141,22 @@ func _physics_process(delta: float) -> void:
 		_trigger_dash()
 	
 	move_and_slide()
+	_enforce_map_bounds()
+	_enforce_ground_height()
+
+const MAP_BOUNDARY_LIMIT: float = 78.5
+
+func _enforce_map_bounds() -> void:
+	global_position.x = clamp(global_position.x, -MAP_BOUNDARY_LIMIT, MAP_BOUNDARY_LIMIT)
+	global_position.z = clamp(global_position.z, -MAP_BOUNDARY_LIMIT, MAP_BOUNDARY_LIMIT)
+
+func _enforce_ground_height() -> void:
+	var floor_nodes = get_tree().get_nodes_in_group("procedural_floor")
+	if not floor_nodes.is_empty():
+		var gh = floor_nodes[0].get_height_at(global_position.x, global_position.z)
+		if global_position.y < gh - 0.15:
+			global_position.y = gh + 0.02
+			velocity.y = 0.0
 
 func _trigger_dash() -> void:
 	is_dashing = true
@@ -152,8 +187,8 @@ func take_damage(amount: float) -> void:
 func _flash_hit() -> void:
 	is_invulnerable = true
 	var tween = create_tween()
-	tween.tween_property(visual_node, "modulate", Color(2.5, 0.3, 0.3, 1.0), 0.06)
-	tween.tween_property(visual_node, "modulate", Color.WHITE, 0.06)
+	tween.tween_property(visual_node, "scale", Vector3(1.15, 0.85, 1.15), 0.06)
+	tween.tween_property(visual_node, "scale", Vector3(1.0, 1.0, 1.0), 0.06)
 	tween.tween_callback(func(): is_invulnerable = false)
 
 func _die() -> void:

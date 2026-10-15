@@ -21,6 +21,7 @@ func _ready() -> void:
 	
 	# Connect spawner signals
 	if spawner:
+		spawner.player = player
 		spawner.boss_spawned.connect(_on_boss_spawned)
 		spawner.stage_cleared.connect(_on_stage_cleared)
 	

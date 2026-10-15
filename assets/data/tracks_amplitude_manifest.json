@@ -1,0 +1,1082 @@
+{
+  "Armageddon": {
+    "title": "Armageddon",
+    "file_name": "Armageddon.mp3",
+    "rms_db": -15.6,
+    "max_db": -0.7,
+    "dynamic_range_db": 14.9,
+    "normalized_energy": 0.525,
+    "seed": 1591503985,
+    "height_scale": 2.08,
+    "voronoi_scale": 0.0705,
+    "palette_name": "Solar Crimson & Gold",
+    "primary_color": [
+      1.0,
+      0.85,
+      0.12,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.22,
+      0.15,
+      1.0
+    ],
+    "ambient_color": [
+      0.08,
+      0.02,
+      0.03,
+      1.0
+    ]
+  },
+  "Azrael": {
+    "title": "Azrael",
+    "file_name": "Azrael.mp3",
+    "rms_db": -14.8,
+    "max_db": -2.1,
+    "dynamic_range_db": 12.7,
+    "normalized_energy": 0.575,
+    "seed": 850484871,
+    "height_scale": 2.0,
+    "voronoi_scale": 0.0663,
+    "palette_name": "Electric Violet & Teal",
+    "primary_color": [
+      0.75,
+      0.2,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.9,
+      0.8,
+      1.0
+    ],
+    "ambient_color": [
+      0.04,
+      0.01,
+      0.07,
+      1.0
+    ]
+  },
+  "Beat to a Masterpiece": {
+    "title": "Beat to a Masterpiece",
+    "file_name": "Beat to a Masterpiece.mp3",
+    "rms_db": -15.4,
+    "max_db": -0.4,
+    "dynamic_range_db": 15.0,
+    "normalized_energy": 0.537,
+    "seed": 2037599605,
+    "height_scale": 2.09,
+    "voronoi_scale": 0.0465,
+    "palette_name": "Solar Crimson & Gold",
+    "primary_color": [
+      1.0,
+      0.85,
+      0.12,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.22,
+      0.15,
+      1.0
+    ],
+    "ambient_color": [
+      0.08,
+      0.02,
+      0.03,
+      1.0
+    ]
+  },
+  "Big Zeus": {
+    "title": "Big Zeus",
+    "file_name": "Big Zeus.mp3",
+    "rms_db": -16.5,
+    "max_db": -0.6,
+    "dynamic_range_db": 15.9,
+    "normalized_energy": 0.469,
+    "seed": 244391360,
+    "height_scale": 2.1,
+    "voronoi_scale": 0.063,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Chump and the Thunder": {
+    "title": "Chump and the Thunder",
+    "file_name": "Chump and the Thunder.mp3",
+    "rms_db": -16.0,
+    "max_db": -1.1,
+    "dynamic_range_db": 14.9,
+    "normalized_energy": 0.5,
+    "seed": 306939102,
+    "height_scale": 2.07,
+    "voronoi_scale": 0.0456,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "Conquered Love": {
+    "title": "Conquered Love",
+    "file_name": "Conquered Love.mp3",
+    "rms_db": -16.6,
+    "max_db": -2.5,
+    "dynamic_range_db": 14.1,
+    "normalized_energy": 0.462,
+    "seed": 1653314178,
+    "height_scale": 2.02,
+    "voronoi_scale": 0.0684,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "Exorcist": {
+    "title": "Exorcist",
+    "file_name": "Exorcist.mp3",
+    "rms_db": -15.7,
+    "max_db": -1.4,
+    "dynamic_range_db": 14.3,
+    "normalized_energy": 0.519,
+    "seed": 1748290409,
+    "height_scale": 2.05,
+    "voronoi_scale": 0.0477,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "God Mode": {
+    "title": "God Mode",
+    "file_name": "God Mode.mp3",
+    "rms_db": -15.0,
+    "max_db": -0.0,
+    "dynamic_range_db": 15.0,
+    "normalized_energy": 0.562,
+    "seed": 1030088980,
+    "height_scale": 2.1,
+    "voronoi_scale": 0.069,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "I'm Not a Viking": {
+    "title": "I'm Not a Viking",
+    "file_name": "I'm Not a Viking.mp3",
+    "rms_db": -15.8,
+    "max_db": -3.2,
+    "dynamic_range_db": 12.6,
+    "normalized_energy": 0.512,
+    "seed": 1443881373,
+    "height_scale": 1.97,
+    "voronoi_scale": 0.0669,
+    "palette_name": "Electric Violet & Teal",
+    "primary_color": [
+      0.75,
+      0.2,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.9,
+      0.8,
+      1.0
+    ],
+    "ambient_color": [
+      0.04,
+      0.01,
+      0.07,
+      1.0
+    ]
+  },
+  "Iced Out": {
+    "title": "Iced Out",
+    "file_name": "Iced Out.mp3",
+    "rms_db": -15.7,
+    "max_db": -1.6,
+    "dynamic_range_db": 14.1,
+    "normalized_energy": 0.519,
+    "seed": 1061914147,
+    "height_scale": 2.04,
+    "voronoi_scale": 0.0591,
+    "palette_name": "Solar Crimson & Gold",
+    "primary_color": [
+      1.0,
+      0.85,
+      0.12,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.22,
+      0.15,
+      1.0
+    ],
+    "ambient_color": [
+      0.08,
+      0.02,
+      0.03,
+      1.0
+    ]
+  },
+  "Immortal Ain\u2019t Bulletproof": {
+    "title": "Immortal Ain\u2019t Bulletproof",
+    "file_name": "Immortal Ain\u2019t Bulletproof.mp3",
+    "rms_db": -16.3,
+    "max_db": -0.6,
+    "dynamic_range_db": 15.7,
+    "normalized_energy": 0.481,
+    "seed": 1453253543,
+    "height_scale": 2.1,
+    "voronoi_scale": 0.0579,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Immortals Ain\u2019t Bulletproof": {
+    "title": "Immortals Ain\u2019t Bulletproof",
+    "file_name": "Immortals Ain\u2019t Bulletproof.mp3",
+    "rms_db": -17.0,
+    "max_db": -1.8,
+    "dynamic_range_db": 15.2,
+    "normalized_energy": 0.438,
+    "seed": 199459315,
+    "height_scale": 2.06,
+    "voronoi_scale": 0.0495,
+    "palette_name": "Solar Crimson & Gold",
+    "primary_color": [
+      1.0,
+      0.85,
+      0.12,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.22,
+      0.15,
+      1.0
+    ],
+    "ambient_color": [
+      0.08,
+      0.02,
+      0.03,
+      1.0
+    ]
+  },
+  "Into The Temple": {
+    "title": "Into The Temple",
+    "file_name": "Into The Temple.mp3",
+    "rms_db": -15.4,
+    "max_db": -0.4,
+    "dynamic_range_db": 15.0,
+    "normalized_energy": 0.537,
+    "seed": 262545510,
+    "height_scale": 2.09,
+    "voronoi_scale": 0.048,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "Leotard": {
+    "title": "Leotard",
+    "file_name": "Leotard.mp3",
+    "rms_db": -16.0,
+    "max_db": -1.9,
+    "dynamic_range_db": 14.1,
+    "normalized_energy": 0.5,
+    "seed": 375798429,
+    "height_scale": 2.03,
+    "voronoi_scale": 0.0537,
+    "palette_name": "Electric Violet & Teal",
+    "primary_color": [
+      0.75,
+      0.2,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.9,
+      0.8,
+      1.0
+    ],
+    "ambient_color": [
+      0.04,
+      0.01,
+      0.07,
+      1.0
+    ]
+  },
+  "Lilith Reborn": {
+    "title": "Lilith Reborn",
+    "file_name": "Lilith Reborn.mp3",
+    "rms_db": -15.5,
+    "max_db": -1.4,
+    "dynamic_range_db": 14.1,
+    "normalized_energy": 0.531,
+    "seed": 1267336718,
+    "height_scale": 2.05,
+    "voronoi_scale": 0.0504,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Loki and the Bottle of Mead": {
+    "title": "Loki and the Bottle of Mead",
+    "file_name": "Loki and the Bottle of Mead.mp3",
+    "rms_db": -16.0,
+    "max_db": -1.6,
+    "dynamic_range_db": 14.4,
+    "normalized_energy": 0.5,
+    "seed": 1010422028,
+    "height_scale": 2.05,
+    "voronoi_scale": 0.0534,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Mead in the Rug": {
+    "title": "Mead in the Rug",
+    "file_name": "Mead in the Rug.mp3",
+    "rms_db": -15.1,
+    "max_db": -2.2,
+    "dynamic_range_db": 12.9,
+    "normalized_energy": 0.556,
+    "seed": 531610721,
+    "height_scale": 2.0,
+    "voronoi_scale": 0.0513,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Myst Water Blessings": {
+    "title": "Myst Water Blessings",
+    "file_name": "Myst Water Blessings.mp3",
+    "rms_db": -16.3,
+    "max_db": -1.8,
+    "dynamic_range_db": 14.5,
+    "normalized_energy": 0.481,
+    "seed": 1138202298,
+    "height_scale": 2.04,
+    "voronoi_scale": 0.0744,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "Ninja Pharaoh": {
+    "title": "Ninja Pharaoh",
+    "file_name": "Ninja Pharaoh.mp3",
+    "rms_db": -16.7,
+    "max_db": -1.7,
+    "dynamic_range_db": 15.0,
+    "normalized_energy": 0.456,
+    "seed": 1477474730,
+    "height_scale": 2.06,
+    "voronoi_scale": 0.054,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "No Problem": {
+    "title": "No Problem",
+    "file_name": "No Problem.mp3",
+    "rms_db": -16.7,
+    "max_db": -3.2,
+    "dynamic_range_db": 13.5,
+    "normalized_energy": 0.456,
+    "seed": 504900754,
+    "height_scale": 1.99,
+    "voronoi_scale": 0.0612,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "Not Lucifer": {
+    "title": "Not Lucifer",
+    "file_name": "Not Lucifer.mp3",
+    "rms_db": -15.8,
+    "max_db": -2.0,
+    "dynamic_range_db": 13.8,
+    "normalized_energy": 0.512,
+    "seed": 742006660,
+    "height_scale": 2.03,
+    "voronoi_scale": 0.063,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "Olaf's Broke Car": {
+    "title": "Olaf's Broke Car",
+    "file_name": "Olaf's Broke Car.mp3",
+    "rms_db": -16.6,
+    "max_db": -1.9,
+    "dynamic_range_db": 14.7,
+    "normalized_energy": 0.462,
+    "seed": 293239160,
+    "height_scale": 2.05,
+    "voronoi_scale": 0.063,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Olympus Mainframe": {
+    "title": "Olympus Mainframe",
+    "file_name": "Olympus Mainframe.mp3",
+    "rms_db": -17.5,
+    "max_db": -5.0,
+    "dynamic_range_db": 12.5,
+    "normalized_energy": 0.406,
+    "seed": 225587402,
+    "height_scale": 1.93,
+    "voronoi_scale": 0.0456,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Pantheon in Neon": {
+    "title": "Pantheon in Neon",
+    "file_name": "Pantheon in Neon.mp3",
+    "rms_db": -16.9,
+    "max_db": -3.9,
+    "dynamic_range_db": 13.0,
+    "normalized_energy": 0.444,
+    "seed": 92319335,
+    "height_scale": 1.96,
+    "voronoi_scale": 0.0555,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Paranoid Pharaoh": {
+    "title": "Paranoid Pharaoh",
+    "file_name": "Paranoid Pharaoh.mp3",
+    "rms_db": -16.3,
+    "max_db": -1.8,
+    "dynamic_range_db": 14.5,
+    "normalized_energy": 0.481,
+    "seed": 2005576188,
+    "height_scale": 2.04,
+    "voronoi_scale": 0.0714,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "Peaches for the Pharaoh": {
+    "title": "Peaches for the Pharaoh",
+    "file_name": "Peaches for the Pharaoh.mp3",
+    "rms_db": -15.9,
+    "max_db": -0.2,
+    "dynamic_range_db": 15.7,
+    "normalized_energy": 0.506,
+    "seed": 230452154,
+    "height_scale": 2.11,
+    "voronoi_scale": 0.0612,
+    "palette_name": "Jade Emerald & Azure",
+    "primary_color": [
+      0.0,
+      1.0,
+      0.45,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.65,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.01,
+      0.05,
+      0.04,
+      1.0
+    ]
+  },
+  "Peaches in the Pyramid": {
+    "title": "Peaches in the Pyramid",
+    "file_name": "Peaches in the Pyramid.mp3",
+    "rms_db": -15.6,
+    "max_db": -0.8,
+    "dynamic_range_db": 14.8,
+    "normalized_energy": 0.525,
+    "seed": 177774671,
+    "height_scale": 2.08,
+    "voronoi_scale": 0.0663,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Silicon Smoke Signals": {
+    "title": "Silicon Smoke Signals",
+    "file_name": "Silicon Smoke Signals.mp3",
+    "rms_db": -16.2,
+    "max_db": -4.1,
+    "dynamic_range_db": 12.1,
+    "normalized_energy": 0.488,
+    "seed": 1351158688,
+    "height_scale": 1.94,
+    "voronoi_scale": 0.0714,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "Sparkling After The War": {
+    "title": "Sparkling After The War",
+    "file_name": "Sparkling After The War.mp3",
+    "rms_db": -16.6,
+    "max_db": -2.4,
+    "dynamic_range_db": 14.2,
+    "normalized_energy": 0.462,
+    "seed": 1830281165,
+    "height_scale": 2.02,
+    "voronoi_scale": 0.0645,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Stay Off Aphrodite's Bad Side": {
+    "title": "Stay Off Aphrodite's Bad Side",
+    "file_name": "Stay Off Aphrodite's Bad Side.mp3",
+    "rms_db": -15.6,
+    "max_db": -1.7,
+    "dynamic_range_db": 13.9,
+    "normalized_energy": 0.525,
+    "seed": 1613731752,
+    "height_scale": 2.04,
+    "voronoi_scale": 0.0606,
+    "palette_name": "Neon Cyan & Magenta",
+    "primary_color": [
+      0.0,
+      0.95,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      1.0,
+      0.08,
+      0.58,
+      1.0
+    ],
+    "ambient_color": [
+      0.03,
+      0.02,
+      0.08,
+      1.0
+    ]
+  },
+  "The Mead Runs Out": {
+    "title": "The Mead Runs Out",
+    "file_name": "The Mead Runs Out.mp3",
+    "rms_db": -13.4,
+    "max_db": -1.8,
+    "dynamic_range_db": 11.6,
+    "normalized_energy": 0.662,
+    "seed": 1293892948,
+    "height_scale": 1.99,
+    "voronoi_scale": 0.0594,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "The Wrath of Osiris": {
+    "title": "The Wrath of Osiris",
+    "file_name": "The Wrath of Osiris.mp3",
+    "rms_db": -17.4,
+    "max_db": 0.0,
+    "dynamic_range_db": 17.4,
+    "normalized_energy": 0.413,
+    "seed": 1056996784,
+    "height_scale": 2.15,
+    "voronoi_scale": 0.0702,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "Three Thrones, One Flame": {
+    "title": "Three Thrones, One Flame",
+    "file_name": "Three Thrones, One Flame.mp3",
+    "rms_db": -16.1,
+    "max_db": -1.9,
+    "dynamic_range_db": 14.2,
+    "normalized_energy": 0.494,
+    "seed": 1131002721,
+    "height_scale": 2.04,
+    "voronoi_scale": 0.0513,
+    "palette_name": "Electric Violet & Teal",
+    "primary_color": [
+      0.75,
+      0.2,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.9,
+      0.8,
+      1.0
+    ],
+    "ambient_color": [
+      0.04,
+      0.01,
+      0.07,
+      1.0
+    ]
+  },
+  "Thunder For Breakfast": {
+    "title": "Thunder For Breakfast",
+    "file_name": "Thunder For Breakfast.mp3",
+    "rms_db": -14.7,
+    "max_db": -3.2,
+    "dynamic_range_db": 11.5,
+    "normalized_energy": 0.581,
+    "seed": 1547296180,
+    "height_scale": 1.95,
+    "voronoi_scale": 0.069,
+    "palette_name": "Pharaoh Amber & Lapis",
+    "primary_color": [
+      1.0,
+      0.65,
+      0.1,
+      1.0
+    ],
+    "secondary_color": [
+      0.15,
+      0.4,
+      1.0,
+      1.0
+    ],
+    "ambient_color": [
+      0.05,
+      0.03,
+      0.02,
+      1.0
+    ]
+  },
+  "Thunder in the Backseat": {
+    "title": "Thunder in the Backseat",
+    "file_name": "Thunder in the Backseat.mp3",
+    "rms_db": -14.2,
+    "max_db": -0.4,
+    "dynamic_range_db": 13.8,
+    "normalized_energy": 0.613,
+    "seed": 44494841,
+    "height_scale": 2.07,
+    "voronoi_scale": 0.0573,
+    "palette_name": "Glitch Acid & Toxic Lime",
+    "primary_color": [
+      0.55,
+      1.0,
+      0.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.95,
+      0.1,
+      0.95,
+      1.0
+    ],
+    "ambient_color": [
+      0.02,
+      0.04,
+      0.02,
+      1.0
+    ]
+  },
+  "Widjet": {
+    "title": "Widjet",
+    "file_name": "Widjet.mp3",
+    "rms_db": -16.1,
+    "max_db": -0.9,
+    "dynamic_range_db": 15.2,
+    "normalized_energy": 0.494,
+    "seed": 793251585,
+    "height_scale": 2.08,
+    "voronoi_scale": 0.0705,
+    "palette_name": "Electric Violet & Teal",
+    "primary_color": [
+      0.75,
+      0.2,
+      1.0,
+      1.0
+    ],
+    "secondary_color": [
+      0.0,
+      0.9,
+      0.8,
+      1.0
+    ],
+    "ambient_color": [
+      0.04,
+      0.01,
+      0.07,
+      1.0
+    ]
+  }
+}
