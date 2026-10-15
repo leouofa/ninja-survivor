@@ -1,6 +1,6 @@
 extends WeaponBase
 
-var shuriken_mesh_scene = preload("res://assets/models/weapon_shuriken.glb")
+var shuriken_mesh_scene = preload("res://assets/models/weapon_shuriken_razor.glb")
 var projectile_script = preload("res://scripts/weapons/Projectile.gd")
 
 func _init() -> void:
@@ -63,11 +63,15 @@ func _spawn_shuriken(dir: Vector3) -> void:
 	proj.pierce = 1 + (1 if level >= 4 else 0)
 	proj.lifetime = 2.5
 	proj.spin_speed = 20.0
+	proj.enable_trail = true
+	proj.enable_blade_blur = true
+	proj.blade_blur_radius = 0.62
+	proj.trail_color = Color(0.0, 1.0, 1.0)
 	
 	# Visual model
 	var model = shuriken_mesh_scene.instantiate()
 	model.name = "Visuals"
-	model.scale = Vector3(1.2, 1.2, 1.2)
+	model.scale = Vector3(1.15, 1.15, 1.15)
 	proj.add_child(model)
 	
 	# Collision shape
