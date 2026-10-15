@@ -111,35 +111,94 @@ func get_next_track(current_title: String) -> Dictionary:
 				return tracks_list[0]
 	return tracks_list[0] if not tracks_list.is_empty() else {}
 
-func mark_level_cleared(track_title: String, survival_time: float, kills: int) -> void:
-	if not track_title in unlocked_tracks:
-		unlocked_tracks.append(track_title)
-	
-	# Unlock next track in sequence
-	var next_track = get_next_track(track_title)
-	if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
-		unlocked_tracks.append(next_track["title"])
-	
+func record_run_result(track_title: String, survival_time: float, kills: int, cleared: bool) -> Dictionary:
+	var had_record = high_scores.has(track_title)
 	var current_best = high_scores.get(track_title, {"best_time": 0.0, "cleared": false, "kills": 0})
+	var prev_kills = int(current_best.get("kills", 0))
+	var prev_time = float(current_best.get("best_time", 0.0))
+	var prev_cleared = bool(current_best.get("cleared", false))
+	
+	var is_first = not had_record
+	var is_new_record = had_record and (kills > prev_kills)
+	var is_tie = had_record and (kills == prev_kills)
+	var diff = kills - prev_kills
+	
+	if cleared:
+		if not track_title in unlocked_tracks:
+			unlocked_tracks.append(track_title)
+		
+		# Unlock next track in sequence
+		var next_track = get_next_track(track_title)
+		if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
+			unlocked_tracks.append(next_track["title"])
+	
 	high_scores[track_title] = {
-		"best_time": max(current_best.get("best_time", 0.0), survival_time),
-		"cleared": true,
-		"kills": max(current_best.get("kills", 0), kills)
+		"best_time": max(prev_time, survival_time),
+		"cleared": prev_cleared or cleared,
+		"kills": max(prev_kills, kills)
 	}
 	
 	save_game_data()
-	level_cleared.emit(track_title)
+	
+	if cleared:
+		level_cleared.emit(track_title)
+	
+	return {
+		"is_first_record": is_first,
+		"is_new_record": is_new_record,
+		"is_tie": is_tie,
+		"diff": diff,
+		"previous_kills": prev_kills,
+		"current_kills": kills,
+		"best_kills": high_scores[track_title]["kills"],
+		"cleared": high_scores[track_title]["cleared"],
+		"best_time": high_scores[track_title]["best_time"]
+	}
 
-func record_run_stats(survival_time: float, kills: int) -> void:
-	if current_track_info.has("title"):
-		var title = current_track_info["title"]
-		var current_best = high_scores.get(title, {"best_time": 0.0, "cleared": false, "kills": 0})
-		high_scores[title] = {
-			"best_time": max(current_best.get("best_time", 0.0), survival_time),
-			"cleared": current_best.get("cleared", false),
-			"kills": max(current_best.get("kills", 0), kills)
-		}
-		save_game_data()
+func mark_level_cleared(track_title: String, survival_time: float, kills: int) -> Dictionary:
+	return record_run_result(track_title, survival_time, kills, true)
+
+func record_run_stats(survival_time: float, kills: int) -> Dictionary:
+	var title = current_track_info.get("title", "")
+	if title != "":
+		return record_run_result(title, survival_time, kills, false)
+	return {
+		"is_first_record": false,
+		"is_new_record": false,
+		"is_tie": false,
+		"diff": 0,
+		"previous_kills": 0,
+		"current_kills": kills,
+		"best_kills": kills,
+		"cleared": false,
+		"best_time": survival_time
+	}
+
+func get_high_scores_sorted() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	for title in high_scores.keys():
+		var data = high_scores[title]
+		if data is Dictionary:
+			result.append({
+				"title": str(title),
+				"kills": int(data.get("kills", 0)),
+				"best_time": float(data.get("best_time", 0.0)),
+				"cleared": bool(data.get("cleared", false))
+			})
+	result.sort_custom(func(a, b):
+		if a["kills"] != b["kills"]:
+			return a["kills"] > b["kills"]
+		return a["best_time"] > b["best_time"]
+	)
+	return result
+
+func get_total_kills() -> int:
+	var total: int = 0
+	for title in high_scores.keys():
+		var data = high_scores[title]
+		if data is Dictionary:
+			total += int(data.get("kills", 0))
+	return total
 
 func save_game_data() -> void:
 	var data = {

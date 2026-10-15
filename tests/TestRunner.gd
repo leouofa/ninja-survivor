@@ -294,5 +294,111 @@ func _ready() -> void:
 	
 	arena.queue_free()
 	
+	print("\n--- BEGIN TEST: High Scores System ---")
+	# Backup original high scores and unlocked tracks
+	var backup_scores = GameManager.high_scores.duplicate(true)
+	var backup_unlocked = GameManager.unlocked_tracks.duplicate()
+	
+	# Clear for isolated testing
+	GameManager.high_scores.clear()
+	
+	# 1. Test first run recording (First Record)
+	var r1 = GameManager.record_run_result("Neon Shibuya", 85.0, 42, false)
+	assert(r1.is_first_record == true, "First run should be marked is_first_record")
+	assert(r1.is_new_record == false, "First run should not be is_new_record")
+	assert(r1.diff == 42, "Diff on first record should equal kills")
+	assert(r1.previous_kills == 0, "Previous kills should be 0")
+	assert(r1.best_kills == 42, "Best kills should be 42")
+	print("✓ First run record metadata verified")
+	
+	# 2. Test beating the high score on victory
+	var r2 = GameManager.record_run_result("Neon Shibuya", 140.0, 68, true)
+	assert(r2.is_first_record == false, "Subsequent run is not first record")
+	assert(r2.is_new_record == true, "Higher score must trigger is_new_record")
+	assert(r2.diff == 26, "Diff should be +26 (68 - 42)")
+	assert(r2.previous_kills == 42, "Previous kills should be 42")
+	assert(r2.best_kills == 68, "Best kills should be 68")
+	assert(r2.cleared == true, "Level cleared should be recorded")
+	print("✓ High score broken on victory verified (+26 kills)")
+	
+	# 3. Test tying the high score
+	var r3 = GameManager.record_run_result("Neon Shibuya", 150.0, 68, true)
+	assert(r3.is_tie == true, "Identical score must trigger is_tie")
+	assert(r3.is_new_record == false, "Tie is not a new record")
+	assert(r3.diff == 0, "Diff on tie must be 0")
+	print("✓ High score tied verified")
+	
+	# 4. Test lower score on game over loss
+	var r4 = GameManager.record_run_result("Neon Shibuya", 45.0, 20, false)
+	assert(r4.is_first_record == false, "Not first record")
+	assert(r4.is_new_record == false, "Lower score is not a new record")
+	assert(r4.is_tie == false, "Lower score is not a tie")
+	assert(r4.diff == -48, "Diff should be -48 (20 - 68)")
+	assert(r4.previous_kills == 68, "Previous high score was 68")
+	assert(r4.best_kills == 68, "Best kills remains 68")
+	print("✓ Defeat with lower score comparison verified (-48 kills)")
+	
+	# 5. Test multi-track ranking and get_high_scores_sorted()
+	GameManager.record_run_result("Cyber Pagoda", 200.0, 115, true)
+	GameManager.record_run_result("Underground Protocol", 60.0, 15, false)
+	
+	var sorted_scores = GameManager.get_high_scores_sorted()
+	assert(sorted_scores.size() == 3, "Expected 3 recorded tracks")
+	assert(sorted_scores[0]["title"] == "Cyber Pagoda" and sorted_scores[0]["kills"] == 115, "1st place must be Cyber Pagoda with 115 kills")
+	assert(sorted_scores[1]["title"] == "Neon Shibuya" and sorted_scores[1]["kills"] == 68, "2nd place must be Neon Shibuya with 68 kills")
+	assert(sorted_scores[2]["title"] == "Underground Protocol" and sorted_scores[2]["kills"] == 15, "3rd place must be Underground Protocol with 15 kills")
+	print("✓ Leaderboard sorting descending by max kills verified (115 > 68 > 15)")
+	
+	var total_kills = GameManager.get_total_kills()
+	assert(total_kills == 115 + 68 + 15, "Total kills across records should equal 198")
+	print("✓ Total yokai kill count accumulator verified (%d kills)" % total_kills)
+	
+	# 6. Test UI Scenes: MainMenu, HighScoresScreen, VictoryScreen, GameOverScreen
+	var main_menu_scene = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(main_menu_scene)
+	var high_scores_btn = main_menu_scene.find_child("HighScoresBtn", true, false)
+	assert(high_scores_btn != null, "HighScoresBtn must exist in MainMenu")
+	assert(high_scores_btn.text == "HIGH SCORES", "Button text must be 'HIGH SCORES'")
+	main_menu_scene.queue_free()
+	print("✓ MainMenu 'HIGH SCORES' button integration verified")
+	
+	var hs_screen = load("res://scenes/menu/HighScoresScreen.tscn").instantiate()
+	add_child(hs_screen)
+	var scores_vbox = hs_screen.find_child("ScoresVBox", true, false)
+	assert(scores_vbox != null, "ScoresVBox must exist in HighScoresScreen")
+	assert(scores_vbox.get_child_count() == 3, "HighScoresScreen must display 3 ranked score rows")
+	var back_btn = hs_screen.find_child("BackBtn", true, false)
+	assert(back_btn != null, "BackBtn must exist in HighScoresScreen")
+	hs_screen.queue_free()
+	print("✓ HighScoresScreen leaderboard rendering verified (%d cards displayed)" % 3)
+	
+	var victory_scr = load("res://scenes/ui/VictoryScreen.tscn").instantiate()
+	add_child(victory_scr)
+	var v_hs_label = victory_scr.find_child("HighScoreLabel", true, false)
+	assert(v_hs_label != null, "HighScoreLabel must exist in VictoryScreen")
+	# Trigger victory with new high score
+	victory_scr.show_victory("Neon Shibuya", 180.0, 95)
+	assert("NEW HIGH SCORE" in v_hs_label.text, "HighScoreLabel must indicate NEW HIGH SCORE on victory")
+	assert("+27" in v_hs_label.text, "HighScoreLabel must display delta (+27 kills)")
+	victory_scr.queue_free()
+	print("✓ VictoryScreen high score badge verified (%s)" % v_hs_label.text)
+	
+	var game_over_scr = load("res://scenes/ui/GameOverScreen.tscn").instantiate()
+	add_child(game_over_scr)
+	var go_hs_label = game_over_scr.find_child("HighScoreLabel", true, false)
+	assert(go_hs_label != null, "HighScoreLabel must exist in GameOverScreen")
+	# Trigger game over with lower score (e.g. 30 kills vs 95 high score)
+	game_over_scr.show_game_over("Neon Shibuya", 50.0, 30)
+	assert("TRACK HIGH SCORE" in go_hs_label.text, "GameOverScreen must compare to TRACK HIGH SCORE")
+	assert("95" in go_hs_label.text, "GameOverScreen must show record of 95 kills")
+	assert("-65" in go_hs_label.text, "GameOverScreen must show negative delta (-65 kills)")
+	game_over_scr.queue_free()
+	print("✓ GameOverScreen high score comparison verified (%s)" % go_hs_label.text)
+	
+	# Restore backed up state
+	GameManager.high_scores = backup_scores
+	GameManager.unlocked_tracks = backup_unlocked
+	GameManager.save_game_data()
+	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)

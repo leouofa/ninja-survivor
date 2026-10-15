@@ -4,6 +4,7 @@ const UIThemeHelper = preload("res://scripts/ui/UIThemeHelper.gd")
 
 @onready var track_label: Label = $CenterContainer/VBoxContainer/TrackNameLabel
 @onready var stats_label: Label = $CenterContainer/VBoxContainer/StatsLabel
+@onready var high_score_label: Label = $CenterContainer/VBoxContainer/HighScoreLabel
 @onready var next_btn: Button = $CenterContainer/VBoxContainer/HBoxContainer/NextBtn
 @onready var select_btn: Button = $CenterContainer/VBoxContainer/HBoxContainer/SelectBtn
 @onready var replay_btn: Button = $CenterContainer/VBoxContainer/HBoxContainer/ReplayBtn
@@ -22,11 +23,31 @@ func show_victory(track_title: String, survival_time: float, kills: int) -> void
 	get_tree().paused = true
 	visible = true
 	
-	GameManager.mark_level_cleared(track_title, survival_time, kills)
+	var result = GameManager.mark_level_cleared(track_title, survival_time, kills)
 	
 	track_label.text = "TRACK CLEARED: " + track_title.to_upper()
 	stats_label.text = "SURVIVAL TIME: %s\nYOKAI PURGED: %d" % [_format_time(survival_time), kills]
+	
+	_update_high_score_comparison(result, kills)
 	AudioManager.play_sfx("level_up", 1.2)
+
+func _update_high_score_comparison(result: Dictionary, kills: int) -> void:
+	if result.get("is_first_record", false):
+		high_score_label.text = "★ FIRST CLEAR RECORD: %d YOKAI ★" % kills
+		high_score_label.add_theme_color_override("font_color", UIThemeHelper.COLOR_CYAN)
+	elif result.get("is_new_record", false):
+		var diff = result.get("diff", 0)
+		var prev = result.get("previous_kills", 0)
+		high_score_label.text = "★ NEW HIGH SCORE! +%d YOKAI (PREV: %d) ★" % [diff, prev]
+		high_score_label.add_theme_color_override("font_color", UIThemeHelper.COLOR_GOLD)
+	elif result.get("is_tie", false):
+		high_score_label.text = "★ RECORD TIED: %d YOKAI ★" % kills
+		high_score_label.add_theme_color_override("font_color", UIThemeHelper.COLOR_CYAN)
+	else:
+		var prev = result.get("previous_kills", 0)
+		var diff = result.get("diff", 0)
+		high_score_label.text = "TRACK RECORD: %d YOKAI (%d)" % [prev, diff]
+		high_score_label.add_theme_color_override("font_color", Color(1.0, 0.65, 0.2))
 
 func _format_time(seconds: float) -> String:
 	var total_sec = int(seconds)
