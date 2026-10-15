@@ -502,5 +502,38 @@ func _ready() -> void:
 	
 	pause_menu.queue_free()
 	
+	# --- BEGIN TEST: Procedural Synthwave Background ---
+	print("\n--- BEGIN TEST: Procedural Synthwave Background ---")
+	var bg_scene = load("res://scenes/ui/SynthwaveBackground.tscn")
+	assert(bg_scene != null, "SynthwaveBackground.tscn must exist and load")
+	
+	var bg_inst = bg_scene.instantiate()
+	assert(bg_inst != null, "SynthwaveBackground must instantiate successfully")
+	add_child(bg_inst)
+	
+	# Verify material and shader setup
+	assert(bg_inst.material is ShaderMaterial, "SynthwaveBackground material must be a ShaderMaterial")
+	var bg_mat = bg_inst.material as ShaderMaterial
+	assert(bg_mat.shader != null, "SynthwaveBackground must have an assigned shader")
+	
+	# Verify process audio reactivity
+	bg_inst._process(0.016)
+	var live_amp = bg_mat.get_shader_parameter("live_amplitude")
+	assert(live_amp != null, "Shader parameter 'live_amplitude' must exist")
+	print("✓ SynthwaveBackground shader and audio reactivity verified (live_amplitude parameter exists)")
+	
+	# Verify MainMenu scene contains SynthwaveBackground
+	var menu_scene_packed = load("res://scenes/menu/MainMenu.tscn")
+	assert(menu_scene_packed != null, "MainMenu.tscn must load successfully")
+	var main_menu_inst = menu_scene_packed.instantiate()
+	assert(main_menu_inst.has_node("SynthwaveBackground"), "MainMenu must contain SynthwaveBackground node")
+	var menu_bg = main_menu_inst.get_node("SynthwaveBackground")
+	assert(menu_bg is ColorRect, "SynthwaveBackground node must be a ColorRect")
+	print("✓ MainMenu scene SynthwaveBackground integration verified")
+	
+	bg_inst.queue_free()
+	main_menu_inst.queue_free()
+	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)
+

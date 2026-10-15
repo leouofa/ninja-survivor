@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://main_menu_01"]
+[gd_scene load_steps=3 format=3 uid="uid://main_menu_01"]
 
 [ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_mainmenu"]
+[ext_resource type="PackedScene" uid="uid://synthwave_bg_01" path="res://scenes/ui/SynthwaveBackground.tscn" id="2_synthwave_bg"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -11,14 +12,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mainmenu")
 
-[node name="Background" type="ColorRect" parent="."]
+[node name="SynthwaveBackground" parent="." instance=ExtResource("2_synthwave_bg")]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-color = Color(0.03, 0.02, 0.06, 1)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
