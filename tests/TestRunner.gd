@@ -613,6 +613,77 @@ func _ready() -> void:
 	regated_menu.queue_free()
 	print("✓ MainMenu re-gating after reset verified")
 	
+	# --- BEGIN TEST: Game Completion & Return to Title ---
+	print("\n--- BEGIN TEST: Game Completion & Return to Title ---")
+	
+	# 1. Test GameManager is_final_track & is_game_completed
+	assert(GameManager.tracks_list.size() > 0, "tracks_list should not be empty")
+	var first_title = GameManager.tracks_list[0]["title"]
+	var final_title = GameManager.tracks_list.back()["title"]
+	assert(GameManager.is_final_track(first_title) == false, "First track must not be final track")
+	assert(GameManager.is_final_track(final_title) == true, "Last track in tracks_list must be final track")
+	assert(GameManager.is_final_track("Nonexistent") == false, "Nonexistent track must return false")
+	
+	# Reset state to test completion status
+	GameManager.reset_game_data()
+	assert(GameManager.is_game_completed() == false, "is_game_completed must be false initially")
+	
+	# 2. Test GameCompletionScreen scene loading and structure
+	var comp_scene = load("res://scenes/ui/GameCompletionScreen.tscn")
+	assert(comp_scene != null, "GameCompletionScreen.tscn must load successfully")
+	var comp_inst = comp_scene.instantiate()
+	assert(comp_inst != null, "GameCompletionScreen must instantiate")
+	assert(comp_inst.process_mode == Node.PROCESS_MODE_ALWAYS, "GameCompletionScreen must have PROCESS_MODE_ALWAYS")
+	add_child(comp_inst)
+	
+	assert(comp_inst.visible == false, "GameCompletionScreen must be hidden initially")
+	assert(comp_inst.title_label != null, "TitleLabel must exist")
+	assert(comp_inst.subtitle_label != null, "SubtitleLabel must exist")
+	assert(comp_inst.track_label != null, "TrackNameLabel must exist")
+	assert(comp_inst.stats_label != null, "StatsLabel must exist")
+	assert(comp_inst.high_score_label != null, "HighScoreLabel must exist")
+	assert(comp_inst.career_label != null, "CareerLabel must exist")
+	assert(comp_inst.return_btn != null, "ReturnBtn must exist")
+	assert(comp_inst.return_btn.text == "RETURN TO TITLE", "ReturnBtn text must be 'RETURN TO TITLE'")
+	assert(comp_inst.return_btn.pressed.is_connected(comp_inst._on_return_pressed), "ReturnBtn must connect to _on_return_pressed")
+	print("✓ GameCompletionScreen node structure, signal wiring, and initial state verified")
+	
+	# 3. Simulate clearing final level and showing completion screen
+	get_tree().paused = false
+	comp_inst.show_completion(final_title, 215.0, 88)
+	assert(comp_inst.visible == true, "GameCompletionScreen must be visible after show_completion")
+	assert(get_tree().paused == true, "SceneTree must be paused when completion screen is shown")
+	assert(final_title.to_upper() in comp_inst.track_label.text, "Track label must include final track name")
+	assert("03:35" in comp_inst.stats_label.text, "Stats label must show formatted time 03:35")
+	assert("88" in comp_inst.stats_label.text, "Stats label must show 88 yokai purged")
+	assert(comp_inst.career_label.text.begins_with("TOTAL CAREER YOKAI PURGED:"), "Career label must display total career kills")
+	assert("88" in comp_inst.career_label.text, "Career label must reflect recorded yokai kills")
+	assert(GameManager.is_game_completed() == true, "is_game_completed must be true after clearing final level")
+	print("✓ GameCompletionScreen stats display, pause state, and completion flag verified")
+	
+	# 4. Test GameArena integration
+	var arena_comp_scene = load("res://scenes/game/GameArena.tscn")
+	var test_arena = arena_comp_scene.instantiate()
+	add_child(test_arena)
+	assert(test_arena.has_node("GameCompletionScreen"), "GameArena must contain GameCompletionScreen node")
+	assert(test_arena.game_completion_screen != null, "GameArena must reference game_completion_screen")
+	
+	# Test stage clear routing on non-final track vs final track
+	GameManager.current_track_info = GameManager.tracks_list[0]
+	test_arena._on_stage_cleared()
+	assert(test_arena.victory_screen.visible == true, "Non-final stage must route to VictoryScreen")
+	assert(test_arena.game_completion_screen.visible == false, "Non-final stage must NOT route to GameCompletionScreen")
+	test_arena.victory_screen.visible = false
+	
+	GameManager.current_track_info = GameManager.tracks_list.back()
+	test_arena._on_stage_cleared()
+	assert(test_arena.game_completion_screen.visible == true, "Final stage must route to GameCompletionScreen")
+	print("✓ GameArena completion routing verified (intermediate -> VictoryScreen, final -> GameCompletionScreen)")
+	
+	test_arena.queue_free()
+	comp_inst.queue_free()
+	get_tree().paused = false
+	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)
 

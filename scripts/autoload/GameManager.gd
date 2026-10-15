@@ -98,6 +98,18 @@ func _generate_fallback_amplitude_metadata(title: String, path: String) -> Dicti
 func is_track_unlocked(track_title: String) -> bool:
 	return track_title in unlocked_tracks
 
+func is_final_track(track_title: String) -> bool:
+	if tracks_list.is_empty():
+		return false
+	return tracks_list.back()["title"] == track_title
+
+func is_game_completed() -> bool:
+	if tracks_list.is_empty():
+		return false
+	var final_title = tracks_list.back()["title"]
+	var record = high_scores.get(final_title, {})
+	return record is Dictionary and record.get("cleared", false) == true
+
 func get_next_track(current_title: String) -> Dictionary:
 	for i in range(tracks_list.size()):
 		if tracks_list[i]["title"] == current_title:
@@ -123,10 +135,11 @@ func record_run_result(track_title: String, survival_time: float, kills: int, cl
 		if not track_title in unlocked_tracks:
 			unlocked_tracks.append(track_title)
 		
-		# Unlock next track in sequence
-		var next_track = get_next_track(track_title)
-		if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
-			unlocked_tracks.append(next_track["title"])
+		# Unlock next track in sequence if not at the final track
+		if not is_final_track(track_title):
+			var next_track = get_next_track(track_title)
+			if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
+				unlocked_tracks.append(next_track["title"])
 	
 	high_scores[track_title] = {
 		"best_time": max(prev_time, survival_time),

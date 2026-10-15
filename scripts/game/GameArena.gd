@@ -6,6 +6,7 @@ extends Node3D
 @onready var hud: CanvasLayer = $HUD
 @onready var level_up_screen: CanvasLayer = $LevelUpScreen
 @onready var victory_screen: CanvasLayer = $VictoryScreen
+@onready var game_completion_screen: CanvasLayer = $GameCompletionScreen
 @onready var game_over_screen: CanvasLayer = $GameOverScreen
 @onready var pause_menu: CanvasLayer = $PauseMenu
 
@@ -40,7 +41,8 @@ func _process(delta: float) -> void:
 		GameManager.run_elapsed_time = run_time
 	
 	# Escape / Pause
-	if Input.is_action_just_pressed("pause") and not level_up_screen.visible and not victory_screen.visible and not game_over_screen.visible:
+	var completion_visible = game_completion_screen != null and game_completion_screen.visible
+	if Input.is_action_just_pressed("pause") and not level_up_screen.visible and not victory_screen.visible and not game_over_screen.visible and not completion_visible:
 		var title = GameManager.current_track_info.get("title", "Mission")
 		pause_menu.open_pause_menu(title, run_time, GameManager.player_kills)
 
@@ -57,4 +59,7 @@ func _on_boss_spawned() -> void:
 
 func _on_stage_cleared() -> void:
 	var title = GameManager.current_track_info.get("title", "Mission")
-	victory_screen.show_victory(title, run_time, GameManager.player_kills)
+	if GameManager.is_final_track(title) and game_completion_screen:
+		game_completion_screen.show_completion(title, run_time, GameManager.player_kills)
+	else:
+		victory_screen.show_victory(title, run_time, GameManager.player_kills)

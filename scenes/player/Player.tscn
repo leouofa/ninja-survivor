@@ -1,16 +1,15 @@
-[gd_scene load_steps=3 format=3 uid="uid://player_ninja_01"]
+[gd_scene format=3 uid="uid://bapvh0ej3y88o"]
 
-[ext_resource type="Script" path="res://scripts/player/Player.gd" id="1_player"]
+[ext_resource type="Script" uid="uid://b4muq0n5bi3il" path="res://scripts/player/Player.gd" id="1_player"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_ninja"]
 radius = 0.45
 height = 1.9
 
-[node name="Player" type="CharacterBody3D"]
-collision_layer = 1
+[node name="Player" type="CharacterBody3D" unique_id=1047505238]
 collision_mask = 3
 script = ExtResource("1_player")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=974584952]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.95, 0)
 shape = SubResource("CapsuleShape3D_ninja")
