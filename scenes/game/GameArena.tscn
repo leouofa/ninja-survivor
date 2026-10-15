@@ -1,0 +1,102 @@
+[gd_scene load_steps=15 format=3 uid="uid://game_arena_01"]
+
+[ext_resource type="Script" path="res://scripts/game/GameArena.gd" id="1_arena"]
+[ext_resource type="PackedScene" uid="uid://player_ninja_01" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="Script" path="res://scripts/player/PlayerCamera.gd" id="3_camera"]
+[ext_resource type="Script" path="res://scripts/enemies/EnemySpawner.gd" id="4_spawner"]
+[ext_resource type="PackedScene" uid="uid://hud_scene_01" path="res://scenes/ui/HUD.tscn" id="5_hud"]
+[ext_resource type="PackedScene" uid="uid://levelup_screen_01" path="res://scenes/ui/LevelUpScreen.tscn" id="6_levelup"]
+[ext_resource type="PackedScene" uid="uid://victory_screen_01" path="res://scenes/ui/VictoryScreen.tscn" id="7_victory"]
+[ext_resource type="PackedScene" uid="uid://gameover_screen_01" path="res://scenes/ui/GameOverScreen.tscn" id="8_gameover"]
+[ext_resource type="PackedScene" path="res://assets/models/prop_torii_gate.glb" id="9_torii"]
+
+[sub_resource type="Environment" id="Environment_synthwave"]
+background_mode = 1
+background_color = Color(0.02, 0.015, 0.04, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.12, 0.08, 0.22, 1)
+ambient_light_energy = 1.2
+tonemap_mode = 3
+glow_enabled = true
+glow_levels/1 = 1.0
+glow_levels/2 = 1.0
+glow_levels/3 = 1.0
+glow_levels/5 = 0.5
+glow_intensity = 0.8
+glow_strength = 1.1
+glow_bloom = 0.2
+glow_blend_mode = 1
+fog_enabled = true
+fog_light_color = Color(0.08, 0.03, 0.15, 1)
+fog_density = 0.012
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_floor"]
+albedo_color = Color(0.04, 0.04, 0.07, 1)
+metallic = 0.8
+roughness = 0.25
+emission_enabled = true
+emission = Color(0, 0.5, 0.8, 1)
+emission_energy_multiplier = 0.3
+uv1_scale = Vector3(40, 40, 40)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_arena"]
+material = SubResource("StandardMaterial3D_floor")
+size = Vector2(160, 160)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_floor"]
+size = Vector3(160, 1, 160)
+
+[node name="GameArena" type="Node3D"]
+script = ExtResource("1_arena")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_synthwave")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 20, 0)
+light_color = Color(0.9, 0.8, 1, 1)
+light_energy = 1.2
+shadow_enabled = true
+
+[node name="Ground" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+mesh = SubResource("PlaneMesh_arena")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+shape = SubResource("BoxShape3D_floor")
+
+[node name="Player" parent="." instance=ExtResource("2_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 17, 14)
+current = true
+fov = 48.0
+script = ExtResource("3_camera")
+
+[node name="EnemySpawner" type="Node3D" parent="."]
+script = ExtResource("4_spawner")
+
+[node name="ToriiNorth" parent="." instance=ExtResource("9_torii")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, -45)
+
+[node name="ToriiSouth" parent="." instance=ExtResource("9_torii")]
+transform = Transform3D(-2, 0, -1.74846e-07, 0, 2, 0, 1.74846e-07, 0, -2, 0, 0, 45)
+
+[node name="ToriiEast" parent="." instance=ExtResource("9_torii")]
+transform = Transform3D(-8.74228e-08, 0, 2, 0, 2, 0, -2, 0, -8.74228e-08, 45, 0, 0)
+
+[node name="ToriiWest" parent="." instance=ExtResource("9_torii")]
+transform = Transform3D(-8.74228e-08, 0, -2, 0, 2, 0, 2, 0, -8.74228e-08, -45, 0, 0)
+
+[node name="HUD" parent="." instance=ExtResource("5_hud")]
+
+[node name="LevelUpScreen" parent="." instance=ExtResource("6_levelup")]
+
+[node name="VictoryScreen" parent="." instance=ExtResource("7_victory")]
+
+[node name="GameOverScreen" parent="." instance=ExtResource("8_gameover")]
