@@ -20,10 +20,24 @@ var player_kills: int = 0
 var player_damage_dealt: float = 0.0
 var run_elapsed_time: float = 0.0
 
+const MANIFEST_PATH = "res://assets/data/tracks_amplitude_manifest.json"
+var amplitude_manifest: Dictionary = {}
+
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	load_amplitude_manifest()
 	load_all_tracks()
 	load_save_data()
+
+func load_amplitude_manifest() -> void:
+	amplitude_manifest.clear()
+	if FileAccess.file_exists(MANIFEST_PATH):
+		var file = FileAccess.open(MANIFEST_PATH, FileAccess.READ)
+		if file:
+			var text = file.get_as_text()
+			var parsed = JSON.parse_string(text)
+			if parsed is Dictionary:
+				amplitude_manifest = parsed
 
 func load_all_tracks() -> void:
 	tracks_list.clear()
@@ -35,16 +49,51 @@ func load_all_tracks() -> void:
 			if not dir.current_is_dir() and file_name.ends_with(".mp3"):
 				var track_title = file_name.trim_suffix(".mp3")
 				var full_path = "res://tracks/" + file_name
+				var meta = amplitude_manifest.get(track_title, null)
+				if meta == null:
+					meta = _generate_fallback_amplitude_metadata(track_title, full_path)
+				
 				tracks_list.append({
 					"title": track_title,
 					"file_name": file_name,
 					"path": full_path,
+					"seed": int(meta.get("seed", hash(track_title) & 0x7FFFFFFF)),
+					"rms_db": float(meta.get("rms_db", -16.0)),
+					"max_db": float(meta.get("max_db", 0.0)),
+					"dynamic_range_db": float(meta.get("dynamic_range_db", 16.0)),
+					"normalized_energy": float(meta.get("normalized_energy", 0.5)),
+					"height_scale": float(meta.get("height_scale", 1.9)),
+					"voronoi_scale": float(meta.get("voronoi_scale", 0.05)),
+					"palette_name": str(meta.get("palette_name", "Neon Cyan & Magenta")),
+					"primary_color": meta.get("primary_color", [0.0, 0.95, 1.0, 1.0]),
+					"secondary_color": meta.get("secondary_color", [1.0, 0.08, 0.58, 1.0]),
+					"ambient_color": meta.get("ambient_color", [0.03, 0.02, 0.08, 1.0]),
 				})
 			file_name = dir.get_next()
 		dir.list_dir_end()
 	
 	# Sort tracks alphabetically for consistent level order
 	tracks_list.sort_custom(func(a, b): return a["title"] < b["title"])
+
+func _generate_fallback_amplitude_metadata(title: String, path: String) -> Dictionary:
+	var h = hash(title) & 0x7FFFFFFF
+	var stream = load(path)
+	var stream_len = stream.get_length() if stream else 180.0
+	var seed_val = (h ^ int(stream_len * 1000)) & 0x7FFFFFFF
+	return {
+		"title": title,
+		"seed": seed_val,
+		"rms_db": -16.0,
+		"max_db": -0.5,
+		"dynamic_range_db": 15.5,
+		"normalized_energy": 0.5,
+		"height_scale": 1.85,
+		"voronoi_scale": 0.05,
+		"palette_name": "Fallback Cyber",
+		"primary_color": [0.0, 0.95, 1.0, 1.0],
+		"secondary_color": [1.0, 0.08, 0.58, 1.0],
+		"ambient_color": [0.03, 0.02, 0.08, 1.0],
+	}
 	
 	# If no save yet, default unlock the first track (e.g. Armageddon / Olympus Mainframe)
 	if tracks_list.size() > 0 and unlocked_tracks.is_empty():

@@ -59,6 +59,27 @@ func get_progress_ratio() -> float:
 		return clamp(get_playback_position() / current_duration, 0.0, 1.0)
 	return 0.0
 
+var _smoothed_amplitude: float = 0.0
+
+func _process(delta: float) -> void:
+	if music_player and music_player.playing:
+		var bus_idx = AudioServer.get_bus_index("Master")
+		var peak_l = AudioServer.get_bus_peak_volume_left_db(bus_idx, 0)
+		var peak_r = AudioServer.get_bus_peak_volume_right_db(bus_idx, 0)
+		var peak_db = max(peak_l, peak_r)
+		var raw_amp = 0.0
+		if peak_db > -60.0:
+			raw_amp = clamp((peak_db + 45.0) / 45.0, 0.0, 1.0)
+		if raw_amp > _smoothed_amplitude:
+			_smoothed_amplitude = lerp(_smoothed_amplitude, raw_amp, 25.0 * delta)
+		else:
+			_smoothed_amplitude = lerp(_smoothed_amplitude, raw_amp, 6.0 * delta)
+	else:
+		_smoothed_amplitude = lerp(_smoothed_amplitude, 0.0, 10.0 * delta)
+
+func get_live_amplitude() -> float:
+	return _smoothed_amplitude
+
 func _on_music_finished() -> void:
 	music_finished.emit()
 

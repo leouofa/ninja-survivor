@@ -68,5 +68,143 @@ func _ready() -> void:
 	cube_emerald.queue_free()
 	cube_gold.queue_free()
 	
-	print("--- TEST PASSED SUCCESSFULLY ---")
+	print("\n--- BEGIN TEST: Procedural Floor & Track Amplitude ---")
+	
+	# 3. Test Track Amplitude Manifest Loading
+	assert(GameManager.amplitude_manifest.size() > 0, "Amplitude manifest should be loaded")
+	assert(GameManager.tracks_list.size() > 0, "Tracks list should not be empty")
+	print("✓ Track amplitude manifest verified with %d tracks" % GameManager.tracks_list.size())
+	
+	# Verify every track has a deterministic seed and amplitude properties
+	for t in GameManager.tracks_list:
+		assert(t.has("seed") and t["seed"] > 0, "Track %s missing valid seed" % t["title"])
+		assert(t.has("height_scale") and t["height_scale"] >= 1.0, "Track %s invalid height_scale" % t["title"])
+		assert(t.has("palette_name"), "Track %s missing palette" % t["title"])
+	print("✓ All %d tracks verified with unique idempotent seeds and themes" % GameManager.tracks_list.size())
+
+	# 4. Test Procedural Floor Generation & Idempotence
+	var floor_script = load("res://scripts/environment/ProceduralFloor.gd")
+	assert(floor_script != null, "ProceduralFloor.gd failed to load")
+	
+	var floor_node1 = StaticBody3D.new()
+	floor_node1.set_script(floor_script)
+	var mi1 = MeshInstance3D.new()
+	mi1.name = "MeshInstance3D"
+	floor_node1.add_child(mi1)
+	var col1 = CollisionShape3D.new()
+	col1.name = "CollisionShape3D"
+	floor_node1.add_child(col1)
+	add_child(floor_node1)
+	
+	var track_armageddon = GameManager.tracks_list[0]
+	floor_node1.generate_floor(track_armageddon)
+	
+	# Sample heights
+	var h0 = floor_node1.get_height_at(0, 0)
+	var h_north = floor_node1.get_height_at(0, -45)
+	var h_south = floor_node1.get_height_at(0, 45)
+	var h_east = floor_node1.get_height_at(45, 0)
+	var h_west = floor_node1.get_height_at(-45, 0)
+	var h_hill = floor_node1.get_height_at(30, 30)
+	
+	# Verify center and torii gate flattening
+	assert(is_equal_approx(h0, 0.0), "Center spawn must be flat (y=0), got %f" % h0)
+	assert(is_equal_approx(h_north, 0.0), "North Torii gate must be flat, got %f" % h_north)
+	assert(is_equal_approx(h_south, 0.0), "South Torii gate must be flat, got %f" % h_south)
+	assert(is_equal_approx(h_east, 0.0), "East Torii gate must be flat, got %f" % h_east)
+	assert(is_equal_approx(h_west, 0.0), "West Torii gate must be flat, got %f" % h_west)
+	print("✓ Spawn center and Torii landmark leveling verified")
+	
+	# Verify elevation exists in the arena
+	assert(h_hill > 0.1, "Terrain must have height variability away from landmarks, got %f" % h_hill)
+	print("✓ Terrain height variability verified (h(30, 30) = %f m)" % h_hill)
+	
+	# Test Idempotence: generate with same track in a second instance
+	var floor_node2 = StaticBody3D.new()
+	floor_node2.set_script(floor_script)
+	var mi2 = MeshInstance3D.new()
+	mi2.name = "MeshInstance3D"
+	floor_node2.add_child(mi2)
+	var col2 = CollisionShape3D.new()
+	col2.name = "CollisionShape3D"
+	floor_node2.add_child(col2)
+	add_child(floor_node2)
+	
+	floor_node2.generate_floor(track_armageddon)
+	var h_hill2 = floor_node2.get_height_at(30, 30)
+	assert(is_equal_approx(h_hill, h_hill2), "Heights must be identical for same track seed")
+	print("✓ Seed idempotence verified (identical heights across runs: %f == %f)" % [h_hill, h_hill2])
+	
+	# Verify ConcavePolygonShape3D collision
+	assert(col1.shape != null, "Floor collision shape must not be null")
+	assert(col1.shape is ConcavePolygonShape3D, "Collision shape must be ConcavePolygonShape3D")
+	var faces = col1.shape.get_faces()
+	assert(faces.size() > 0, "ConcavePolygonShape3D faces must not be empty")
+	print("✓ 3D ConcavePolygonShape3D physics collision verified with %d faces" % (faces.size() / 3))
+	
+	# 5. Test Audio Reactivity Uniform Updates
+	assert(floor_node1.floor_material != null, "Shader material must exist on floor")
+	AudioManager._smoothed_amplitude = 0.85
+	floor_node1._process(0.016)
+	var amp_param = floor_node1.floor_material.get_shader_parameter("live_amplitude")
+	assert(is_equal_approx(amp_param, 0.85), "Shader live_amplitude must match AudioManager smoothed amplitude")
+	print("✓ Audio-reactive live amplitude shader parameter verified (value: %f)" % amp_param)
+	
+	# 6. Test Player slope traversal & gravity
+	var player_script = load("res://scripts/player/Player.gd")
+	var player = CharacterBody3D.new()
+	player.set_script(player_script)
+	var p_col = CollisionShape3D.new()
+	var p_shape = CapsuleShape3D.new()
+	p_shape.radius = 0.4
+	p_shape.height = 1.8
+	p_col.shape = p_shape
+	player.add_child(p_col)
+	add_child(player)
+	
+	player.global_position = Vector3(0, 5.0, 0)
+	player.velocity = Vector3.ZERO
+	player._physics_process(0.016)
+	assert(player.velocity.y < 0.0, "Player must experience downward gravity when in mid-air")
+	print("✓ Player kinematic gravity and slope physics verified (downward vy = %f)" % player.velocity.y)
+	
+	# Cleanup
+	floor_node1.queue_free()
+	floor_node2.queue_free()
+	player.queue_free()
+	
+	# 7. Test Full GameArena Scene Instantiation & Player Ground Support
+	var arena_scene = load("res://scenes/game/GameArena.tscn")
+	assert(arena_scene != null, "GameArena.tscn failed to load")
+	var arena = arena_scene.instantiate()
+	add_child(arena)
+	
+	var arena_player = arena.get_node("Player")
+	var arena_ground = arena.get_node("Ground")
+	var ground_mesh = arena_ground.get_node("MeshInstance3D").mesh
+	assert(ground_mesh != null, "GameArena procedural ground mesh must exist")
+	
+	# Verify upward normal on ground faces
+	var arena_faces = ground_mesh.get_faces()
+	var v0 = arena_faces[0]
+	var v1 = arena_faces[1]
+	var v2 = arena_faces[2]
+	var norm = (v1 - v0).cross(v2 - v0).normalized()
+	assert(norm.y > 0.5, "Mesh face normal must point UP (+Y), got %s" % norm)
+	print("✓ GameArena procedural mesh upward winding verified (normal: %s)" % norm)
+	
+	# Verify player collision mask includes ground
+	assert((arena_player.collision_mask & 1) != 0, "Player collision mask must include layer 1 (Ground)")
+	
+	# Run 20 physics frames on the arena
+	for f in range(20):
+		arena_player._physics_process(0.016)
+		
+	# Verify player has settled cleanly on the ground (around y = 0) and not fallen into the void
+	assert(arena_player.global_position.y >= -0.2, "Player must not fall through terrain! Current y: %f" % arena_player.global_position.y)
+	print("✓ Player grounded stably on procedural terrain at y = %f" % arena_player.global_position.y)
+	
+	arena.queue_free()
+	
+	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)

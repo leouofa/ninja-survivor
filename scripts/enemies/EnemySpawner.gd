@@ -70,10 +70,21 @@ func _select_enemy_type(progress: float) -> String:
 		elif roll < 0.8: return "kitsune"
 		else: return "ronin"
 
+var floor_node: Node = null
+
+func _get_ground_height(x: float, z: float) -> float:
+	if floor_node == null:
+		var floors = get_tree().get_nodes_in_group("procedural_floor")
+		if not floors.is_empty():
+			floor_node = floors[0]
+	if floor_node != null:
+		return floor_node.get_height_at(x, z)
+	return 0.0
+
 func _spawn_enemy(type: String) -> void:
 	var angle = randf() * TAU
 	var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * spawn_radius
-	spawn_pos.y = 0.0
+	spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
 	
 	var enemy = CharacterBody3D.new()
 	enemy.set_script(enemy_base_script)
@@ -130,7 +141,7 @@ func _spawn_boss() -> void:
 	
 	var angle = randf() * TAU
 	var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * (spawn_radius * 0.9)
-	spawn_pos.y = 0.0
+	spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
 	
 	var boss = CharacterBody3D.new()
 	boss.set_script(enemy_base_script)
