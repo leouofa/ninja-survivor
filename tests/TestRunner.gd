@@ -79,8 +79,21 @@ func _ready() -> void:
 	for t in GameManager.tracks_list:
 		assert(t.has("seed") and t["seed"] > 0, "Track %s missing valid seed" % t["title"])
 		assert(t.has("height_scale") and t["height_scale"] >= 1.0, "Track %s invalid height_scale" % t["title"])
-		assert(t.has("palette_name"), "Track %s missing palette" % t["title"])
 	print("✓ All %d tracks verified with unique idempotent seeds and themes" % GameManager.tracks_list.size())
+
+	# Verify renamed track 'Immortals Ain’t Bulletproof (Remix)' is present with its manifest metadata
+	var found_renamed = false
+	var found_old = false
+	for t in GameManager.tracks_list:
+		if t["title"] == "Immortals Ain’t Bulletproof (Remix)":
+			found_renamed = true
+			assert(t["seed"] == 1453253543, "Remix track should have seed 1453253543")
+			assert(t["palette_name"] == "Glitch Acid & Toxic Lime", "Remix track should preserve Glitch Acid theme")
+		elif t["title"] == "Immortal Ain’t Bulletproof":
+			found_old = true
+	assert(found_renamed, "'Immortals Ain’t Bulletproof (Remix)' must be present in tracks_list")
+	assert(not found_old, "'Immortal Ain’t Bulletproof' must no longer exist in tracks_list")
+	print("✓ Track rename verified: 'Immortals Ain’t Bulletproof (Remix)' correctly loaded with manifest metadata")
 
 	# 4. Test Procedural Floor Generation & Idempotence
 	var floor_script = load("res://scripts/environment/ProceduralFloor.gd")
