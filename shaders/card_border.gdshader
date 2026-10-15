@@ -20,33 +20,43 @@ void fragment() {
     vec2 half_size = rect_size * 0.5;
     float d = rounded_box_sdf(p, half_size, corner_radius);
 
-    if (d > 1.5) {
+    float outer_aura = 4.0 * is_hovered;
+    if (d > 1.2 + outer_aura) {
         discard;
     }
 
     // Normalized perimeter parameter [0.0, 1.0]
     float angle = atan(p.y, p.x) / (2.0 * PI) + 0.5;
-    float cur_speed = speed * (1.0 + is_hovered * 0.7);
+    float cur_speed = speed * (1.0 + is_hovered * 0.8);
     float beam_pos = fract(angle - TIME * cur_speed * 0.25);
     
     // Smooth comet-like energy beam
     float beam_intensity = smoothstep(beam_length, 0.0, beam_pos) * smoothstep(0.0, 0.03, beam_pos);
 
     // Antialiased shape and border masks
+    float cur_border_w = border_width + is_hovered * 0.8;
     float shape_mask = smoothstep(0.5, -0.5, d);
-    float inner_mask = smoothstep(-border_width + 0.5, -border_width - 0.5, d);
+    float inner_mask = smoothstep(-cur_border_w + 0.5, -cur_border_w - 0.5, d);
     float border_mask = clamp(shape_mask - inner_mask, 0.0, 1.0);
 
     float idle_pulse = 0.75 + pulse_intensity * sin(TIME * 3.0) * 0.25;
-    vec4 bg = mix(background_color, background_color + vec4(border_color.rgb * 0.12, 0.0), is_hovered);
+    vec4 bg = mix(background_color, background_color + vec4(border_color.rgb * 0.18, 0.0), is_hovered);
     
     // Glowing border color with bright leading beam
-    vec4 edge_col = border_color * (idle_pulse + is_hovered * 0.4);
-    edge_col = mix(edge_col, vec4(1.0, 1.0, 1.0, 1.0), beam_intensity * 0.85);
+    vec4 edge_col = border_color * (idle_pulse + is_hovered * 0.55);
+    edge_col = mix(edge_col, vec4(1.0, 1.0, 1.0, 1.0), beam_intensity * (0.85 + is_hovered * 0.15));
     edge_col.a = border_color.a;
 
     vec4 final_col = mix(bg, edge_col, border_mask);
     final_col.a *= shape_mask;
+
+    // Outer neon glow aura on hover
+    if (d > 0.0 && outer_aura > 0.0) {
+        float glow_factor = smoothstep(outer_aura, 0.0, d) * is_hovered * 0.45;
+        vec4 aura_col = border_color;
+        aura_col.a = glow_factor;
+        final_col = mix(final_col, aura_col, 1.0 - shape_mask);
+    }
 
     COLOR = final_col;
 }

@@ -156,11 +156,21 @@ func _create_card(data: Dictionary, index: int) -> Button:
 	bg_rect.material = mat
 	btn.add_child(bg_rect)
 	
+	btn.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	btn.pivot_offset = Vector2(140, 170)
+	
 	btn.mouse_entered.connect(func():
 		mat.set_shader_parameter("is_hovered", 1.0)
+		var tween = btn.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(btn, "scale", Vector2(1.03, 1.03), 0.15)
+		var audio_node = btn.get_node_or_null("/root/AudioManager")
+		if audio_node and audio_node.has_method("play_sfx"):
+			audio_node.play_sfx("ui_hover", 1.1, -6.0)
 	)
 	btn.mouse_exited.connect(func():
 		mat.set_shader_parameter("is_hovered", 0.0)
+		var tween = btn.create_tween().set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tween.tween_property(btn, "scale", Vector2(1.0, 1.0), 0.15)
 	)
 	
 	# Margin container ensuring text has generous padding and never touches the border
