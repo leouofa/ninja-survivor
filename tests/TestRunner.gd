@@ -534,6 +534,85 @@ func _ready() -> void:
 	bg_inst.queue_free()
 	main_menu_inst.queue_free()
 	
+	# --- BEGIN TEST: Title Screen Gating & Game Reset ---
+	print("\n--- BEGIN TEST: Title Screen Gating & Game Reset ---")
+	
+	# 1. Test clean state after reset_game_data()
+	GameManager.reset_game_data()
+	assert(GameManager.high_scores.is_empty(), "High scores should be empty after reset")
+	assert(GameManager.has_beaten_any_level() == false, "has_beaten_any_level() must be false after reset")
+	assert(GameManager.unlocked_tracks.size() == 1, "Only initial track should be unlocked after reset")
+	assert(GameManager.unlocked_tracks[0] == GameManager.tracks_list[0]["title"], "Initial track must be first track in manifest")
+	assert(not FileAccess.file_exists(GameManager.SAVE_PATH), "Save file must be removed after reset")
+	print("✓ Clean reset state verified (high_scores empty, first track only unlocked, save file wiped)")
+	
+	# 2. Test MainMenu button gating when no levels beaten
+	var gated_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(gated_menu)
+	var gated_start = gated_menu.find_child("StartBtn", true, false)
+	var gated_select = gated_menu.find_child("SelectBtn", true, false)
+	var gated_scores = gated_menu.find_child("HighScoresBtn", true, false)
+	assert(gated_start != null and gated_start.disabled == false, "StartBtn must remain enabled")
+	assert(gated_select != null and gated_select.disabled == true, "SelectBtn must be disabled when 0 levels beaten")
+	assert(gated_scores != null and gated_scores.disabled == true, "HighScoresBtn must be disabled when 0 levels beaten")
+	assert(gated_select.text == "MISSION SELECT (36 TRACKS)", "SelectBtn text label preserved")
+	assert(gated_scores.text == "HIGH SCORES", "HighScoresBtn text label preserved")
+	gated_menu.queue_free()
+	print("✓ MainMenu gating verified (SelectBtn and HighScoresBtn disabled when no levels beaten)")
+	
+	# 3. Test unlocking buttons when a level is beaten
+	var track_to_clear = GameManager.tracks_list[0]["title"]
+	GameManager.mark_level_cleared(track_to_clear, 180.0, 75)
+	assert(GameManager.has_beaten_any_level() == true, "has_beaten_any_level() must be true after clearing a level")
+	
+	var unlocked_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(unlocked_menu)
+	var unl_select = unlocked_menu.find_child("SelectBtn", true, false)
+	var unl_scores = unlocked_menu.find_child("HighScoresBtn", true, false)
+	assert(unl_select != null and unl_select.disabled == false, "SelectBtn must be enabled once a level is beaten")
+	assert(unl_scores != null and unl_scores.disabled == false, "HighScoresBtn must be enabled once a level is beaten")
+	unlocked_menu.queue_free()
+	print("✓ MainMenu gating verified (SelectBtn and HighScoresBtn enabled after level beaten)")
+	
+	# 4. Test HighScoresScreen Reset UI and confirmation flow
+	var hs_screen_inst = load("res://scenes/menu/HighScoresScreen.tscn").instantiate()
+	add_child(hs_screen_inst)
+	var reset_btn = hs_screen_inst.find_child("ResetBtn", true, false)
+	var confirm_hbox = hs_screen_inst.find_child("ConfirmResetHBox", true, false)
+	var confirm_btn = hs_screen_inst.find_child("ConfirmResetBtn", true, false)
+	var cancel_btn = hs_screen_inst.find_child("CancelResetBtn", true, false)
+	assert(reset_btn != null and reset_btn.visible == true, "ResetBtn must exist and be visible initially")
+	assert(confirm_hbox != null and confirm_hbox.visible == false, "ConfirmResetHBox must exist and be hidden initially")
+	
+	# Test prompt trigger & cancellation
+	hs_screen_inst._on_reset_pressed()
+	assert(reset_btn.visible == false, "ResetBtn must be hidden during confirmation")
+	assert(confirm_hbox.visible == true, "ConfirmResetHBox must be visible during confirmation")
+	
+	hs_screen_inst._on_cancel_reset_pressed()
+	assert(reset_btn.visible == true, "ResetBtn must restore after cancellation")
+	assert(confirm_hbox.visible == false, "ConfirmResetHBox must hide after cancellation")
+	
+	# Verify button connections
+	assert(confirm_btn.pressed.is_connected(hs_screen_inst._on_confirm_reset_pressed), "Confirm button must connect to _on_confirm_reset_pressed")
+	assert(cancel_btn.pressed.is_connected(hs_screen_inst._on_cancel_reset_pressed), "Cancel button must connect to _on_cancel_reset_pressed")
+	hs_screen_inst.queue_free()
+	print("✓ HighScoresScreen reset UI and confirmation flow verified")
+	
+	# 5. Verify reset_game_data() and MainMenu re-gating after wipe
+	GameManager.reset_game_data()
+	assert(GameManager.has_beaten_any_level() == false, "has_beaten_any_level() must be false after confirm wipe")
+	assert(GameManager.high_scores.is_empty(), "high_scores must be empty after confirm wipe")
+	
+	var regated_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(regated_menu)
+	var reg_select = regated_menu.find_child("SelectBtn", true, false)
+	var reg_scores = regated_menu.find_child("HighScoresBtn", true, false)
+	assert(reg_select.disabled == true, "SelectBtn must be re-disabled after reset")
+	assert(reg_scores.disabled == true, "HighScoresBtn must be re-disabled after reset")
+	regated_menu.queue_free()
+	print("✓ MainMenu re-gating after reset verified")
+	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)
 

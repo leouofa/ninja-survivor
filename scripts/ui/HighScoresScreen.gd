@@ -5,10 +5,21 @@ const UIThemeHelper = preload("res://scripts/ui/UIThemeHelper.gd")
 @onready var back_btn: Button = $MarginContainer/VBoxContainer/TopBar/BackBtn
 @onready var total_kills_label: Label = $MarginContainer/VBoxContainer/TopBar/TotalKillsLabel
 @onready var scores_container: VBoxContainer = $MarginContainer/VBoxContainer/ScrollContainer/ScoresVBox
+@onready var reset_btn: Button = $MarginContainer/VBoxContainer/BottomBar/ResetBtn
+@onready var confirm_reset_hbox: HBoxContainer = $MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox
+@onready var confirm_reset_btn: Button = $MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox/ConfirmResetBtn
+@onready var cancel_reset_btn: Button = $MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox/CancelResetBtn
 
 func _ready() -> void:
 	back_btn.pressed.connect(_on_back_pressed)
+	reset_btn.pressed.connect(_on_reset_pressed)
+	confirm_reset_btn.pressed.connect(_on_confirm_reset_pressed)
+	cancel_reset_btn.pressed.connect(_on_cancel_reset_pressed)
+	
 	UIThemeHelper.apply_synthwave_button_style(back_btn, UIThemeHelper.COLOR_CYAN)
+	UIThemeHelper.apply_synthwave_button_style(reset_btn, UIThemeHelper.COLOR_MAGENTA)
+	UIThemeHelper.apply_synthwave_button_style(confirm_reset_btn, UIThemeHelper.COLOR_MAGENTA)
+	UIThemeHelper.apply_synthwave_button_style(cancel_reset_btn, UIThemeHelper.COLOR_CYAN)
 	_update_header()
 	_populate_scores()
 
@@ -161,4 +172,18 @@ func _format_time(seconds: float) -> String:
 	return "%02d:%02d" % [m, s]
 
 func _on_back_pressed() -> void:
+	GameManager.return_to_main_menu()
+
+func _on_reset_pressed() -> void:
+	reset_btn.visible = false
+	confirm_reset_hbox.visible = true
+	cancel_reset_btn.grab_focus()
+
+func _on_cancel_reset_pressed() -> void:
+	confirm_reset_hbox.visible = false
+	reset_btn.visible = true
+	reset_btn.grab_focus()
+
+func _on_confirm_reset_pressed() -> void:
+	GameManager.reset_game_data()
 	GameManager.return_to_main_menu()

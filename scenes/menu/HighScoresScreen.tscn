@@ -79,11 +79,41 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
 [node name="BottomBar" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 24)
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
 
 [node name="InfoLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.6, 0.6, 0.7, 1)
 theme_override_font_sizes/font_size = 13
 text = "RECORDS ARCHIVE HIGHEST YOKAI PURGE COUNT FOR EACH MISSION"
+
+[node name="ResetBtn" type="Button" parent="MarginContainer/VBoxContainer/BottomBar"]
+custom_minimum_size = Vector2(130, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "RESET DATA"
+
+[node name="ConfirmResetHBox" type="HBoxContainer" parent="MarginContainer/VBoxContainer/BottomBar"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ConfirmPromptLabel" type="Label" parent="MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.4, 1)
+theme_override_font_sizes/font_size = 13
+text = "RESET ALL PROGRESS & SCORES?"
+
+[node name="ConfirmResetBtn" type="Button" parent="MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox"]
+custom_minimum_size = Vector2(120, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "CONFIRM WIPE"
+
+[node name="CancelResetBtn" type="Button" parent="MarginContainer/VBoxContainer/BottomBar/ConfirmResetHBox"]
+custom_minimum_size = Vector2(80, 36)
+layout_mode = 2
+theme_override_font_sizes/font_size = 13
+text = "CANCEL"

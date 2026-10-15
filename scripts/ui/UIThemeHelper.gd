@@ -59,6 +59,7 @@ static func apply_synthwave_button_style(btn: Button, accent_color: Color = COLO
 	btn.add_theme_color_override("font_color", Color(0.9, 0.92, 0.98))
 	btn.add_theme_color_override("font_hover_color", Color.WHITE)
 	btn.add_theme_color_override("font_pressed_color", accent_color)
+	btn.add_theme_color_override("font_disabled_color", Color(0.4, 0.42, 0.5, 0.65))
 	btn.add_theme_color_override("font_hover_shadow_color", Color(accent_color.r, accent_color.g, accent_color.b, 0.8))
 	btn.add_theme_constant_override("shadow_offset_x", 1)
 	btn.add_theme_constant_override("shadow_offset_y", 1)
