@@ -17,6 +17,10 @@ func _ready() -> void:
 	UIThemeHelper.apply_synthwave_button_style(high_scores_btn, UIThemeHelper.COLOR_GOLD)
 	UIThemeHelper.apply_synthwave_button_style(quit_btn, UIThemeHelper.COLOR_PURPLE)
 	
+	var has_beaten_levels = GameManager.has_beaten_any_level()
+	select_btn.disabled = not has_beaten_levels
+	high_scores_btn.disabled = not has_beaten_levels
+	
 	# Start ambient title synth music if not playing
 	if not AudioManager.music_player.playing:
 		if not GameManager.tracks_list.is_empty():

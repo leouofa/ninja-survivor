@@ -534,6 +534,156 @@ func _ready() -> void:
 	bg_inst.queue_free()
 	main_menu_inst.queue_free()
 	
+	# --- BEGIN TEST: Title Screen Gating & Game Reset ---
+	print("\n--- BEGIN TEST: Title Screen Gating & Game Reset ---")
+	
+	# 1. Test clean state after reset_game_data()
+	GameManager.reset_game_data()
+	assert(GameManager.high_scores.is_empty(), "High scores should be empty after reset")
+	assert(GameManager.has_beaten_any_level() == false, "has_beaten_any_level() must be false after reset")
+	assert(GameManager.unlocked_tracks.size() == 1, "Only initial track should be unlocked after reset")
+	assert(GameManager.unlocked_tracks[0] == GameManager.tracks_list[0]["title"], "Initial track must be first track in manifest")
+	assert(not FileAccess.file_exists(GameManager.SAVE_PATH), "Save file must be removed after reset")
+	print("✓ Clean reset state verified (high_scores empty, first track only unlocked, save file wiped)")
+	
+	# 2. Test MainMenu button gating when no levels beaten
+	var gated_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(gated_menu)
+	var gated_start = gated_menu.find_child("StartBtn", true, false)
+	var gated_select = gated_menu.find_child("SelectBtn", true, false)
+	var gated_scores = gated_menu.find_child("HighScoresBtn", true, false)
+	assert(gated_start != null and gated_start.disabled == false, "StartBtn must remain enabled")
+	assert(gated_select != null and gated_select.disabled == true, "SelectBtn must be disabled when 0 levels beaten")
+	assert(gated_scores != null and gated_scores.disabled == true, "HighScoresBtn must be disabled when 0 levels beaten")
+	assert(gated_select.text == "MISSION SELECT (36 TRACKS)", "SelectBtn text label preserved")
+	assert(gated_scores.text == "HIGH SCORES", "HighScoresBtn text label preserved")
+	gated_menu.queue_free()
+	print("✓ MainMenu gating verified (SelectBtn and HighScoresBtn disabled when no levels beaten)")
+	
+	# 3. Test unlocking buttons when a level is beaten
+	var track_to_clear = GameManager.tracks_list[0]["title"]
+	GameManager.mark_level_cleared(track_to_clear, 180.0, 75)
+	assert(GameManager.has_beaten_any_level() == true, "has_beaten_any_level() must be true after clearing a level")
+	
+	var unlocked_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(unlocked_menu)
+	var unl_select = unlocked_menu.find_child("SelectBtn", true, false)
+	var unl_scores = unlocked_menu.find_child("HighScoresBtn", true, false)
+	assert(unl_select != null and unl_select.disabled == false, "SelectBtn must be enabled once a level is beaten")
+	assert(unl_scores != null and unl_scores.disabled == false, "HighScoresBtn must be enabled once a level is beaten")
+	unlocked_menu.queue_free()
+	print("✓ MainMenu gating verified (SelectBtn and HighScoresBtn enabled after level beaten)")
+	
+	# 4. Test HighScoresScreen Reset UI and confirmation flow
+	var hs_screen_inst = load("res://scenes/menu/HighScoresScreen.tscn").instantiate()
+	add_child(hs_screen_inst)
+	var reset_btn = hs_screen_inst.find_child("ResetBtn", true, false)
+	var confirm_hbox = hs_screen_inst.find_child("ConfirmResetHBox", true, false)
+	var confirm_btn = hs_screen_inst.find_child("ConfirmResetBtn", true, false)
+	var cancel_btn = hs_screen_inst.find_child("CancelResetBtn", true, false)
+	assert(reset_btn != null and reset_btn.visible == true, "ResetBtn must exist and be visible initially")
+	assert(confirm_hbox != null and confirm_hbox.visible == false, "ConfirmResetHBox must exist and be hidden initially")
+	
+	# Test prompt trigger & cancellation
+	hs_screen_inst._on_reset_pressed()
+	assert(reset_btn.visible == false, "ResetBtn must be hidden during confirmation")
+	assert(confirm_hbox.visible == true, "ConfirmResetHBox must be visible during confirmation")
+	
+	hs_screen_inst._on_cancel_reset_pressed()
+	assert(reset_btn.visible == true, "ResetBtn must restore after cancellation")
+	assert(confirm_hbox.visible == false, "ConfirmResetHBox must hide after cancellation")
+	
+	# Verify button connections
+	assert(confirm_btn.pressed.is_connected(hs_screen_inst._on_confirm_reset_pressed), "Confirm button must connect to _on_confirm_reset_pressed")
+	assert(cancel_btn.pressed.is_connected(hs_screen_inst._on_cancel_reset_pressed), "Cancel button must connect to _on_cancel_reset_pressed")
+	hs_screen_inst.queue_free()
+	print("✓ HighScoresScreen reset UI and confirmation flow verified")
+	
+	# 5. Verify reset_game_data() and MainMenu re-gating after wipe
+	GameManager.reset_game_data()
+	assert(GameManager.has_beaten_any_level() == false, "has_beaten_any_level() must be false after confirm wipe")
+	assert(GameManager.high_scores.is_empty(), "high_scores must be empty after confirm wipe")
+	
+	var regated_menu = load("res://scenes/menu/MainMenu.tscn").instantiate()
+	add_child(regated_menu)
+	var reg_select = regated_menu.find_child("SelectBtn", true, false)
+	var reg_scores = regated_menu.find_child("HighScoresBtn", true, false)
+	assert(reg_select.disabled == true, "SelectBtn must be re-disabled after reset")
+	assert(reg_scores.disabled == true, "HighScoresBtn must be re-disabled after reset")
+	regated_menu.queue_free()
+	print("✓ MainMenu re-gating after reset verified")
+	
+	# --- BEGIN TEST: Game Completion & Return to Title ---
+	print("\n--- BEGIN TEST: Game Completion & Return to Title ---")
+	
+	# 1. Test GameManager is_final_track & is_game_completed
+	assert(GameManager.tracks_list.size() > 0, "tracks_list should not be empty")
+	var first_title = GameManager.tracks_list[0]["title"]
+	var final_title = GameManager.tracks_list.back()["title"]
+	assert(GameManager.is_final_track(first_title) == false, "First track must not be final track")
+	assert(GameManager.is_final_track(final_title) == true, "Last track in tracks_list must be final track")
+	assert(GameManager.is_final_track("Nonexistent") == false, "Nonexistent track must return false")
+	
+	# Reset state to test completion status
+	GameManager.reset_game_data()
+	assert(GameManager.is_game_completed() == false, "is_game_completed must be false initially")
+	
+	# 2. Test GameCompletionScreen scene loading and structure
+	var comp_scene = load("res://scenes/ui/GameCompletionScreen.tscn")
+	assert(comp_scene != null, "GameCompletionScreen.tscn must load successfully")
+	var comp_inst = comp_scene.instantiate()
+	assert(comp_inst != null, "GameCompletionScreen must instantiate")
+	assert(comp_inst.process_mode == Node.PROCESS_MODE_ALWAYS, "GameCompletionScreen must have PROCESS_MODE_ALWAYS")
+	add_child(comp_inst)
+	
+	assert(comp_inst.visible == false, "GameCompletionScreen must be hidden initially")
+	assert(comp_inst.title_label != null, "TitleLabel must exist")
+	assert(comp_inst.subtitle_label != null, "SubtitleLabel must exist")
+	assert(comp_inst.track_label != null, "TrackNameLabel must exist")
+	assert(comp_inst.stats_label != null, "StatsLabel must exist")
+	assert(comp_inst.high_score_label != null, "HighScoreLabel must exist")
+	assert(comp_inst.career_label != null, "CareerLabel must exist")
+	assert(comp_inst.return_btn != null, "ReturnBtn must exist")
+	assert(comp_inst.return_btn.text == "RETURN TO TITLE", "ReturnBtn text must be 'RETURN TO TITLE'")
+	assert(comp_inst.return_btn.pressed.is_connected(comp_inst._on_return_pressed), "ReturnBtn must connect to _on_return_pressed")
+	print("✓ GameCompletionScreen node structure, signal wiring, and initial state verified")
+	
+	# 3. Simulate clearing final level and showing completion screen
+	get_tree().paused = false
+	comp_inst.show_completion(final_title, 215.0, 88)
+	assert(comp_inst.visible == true, "GameCompletionScreen must be visible after show_completion")
+	assert(get_tree().paused == true, "SceneTree must be paused when completion screen is shown")
+	assert(final_title.to_upper() in comp_inst.track_label.text, "Track label must include final track name")
+	assert("03:35" in comp_inst.stats_label.text, "Stats label must show formatted time 03:35")
+	assert("88" in comp_inst.stats_label.text, "Stats label must show 88 yokai purged")
+	assert(comp_inst.career_label.text.begins_with("TOTAL CAREER YOKAI PURGED:"), "Career label must display total career kills")
+	assert("88" in comp_inst.career_label.text, "Career label must reflect recorded yokai kills")
+	assert(GameManager.is_game_completed() == true, "is_game_completed must be true after clearing final level")
+	print("✓ GameCompletionScreen stats display, pause state, and completion flag verified")
+	
+	# 4. Test GameArena integration
+	var arena_comp_scene = load("res://scenes/game/GameArena.tscn")
+	var test_arena = arena_comp_scene.instantiate()
+	add_child(test_arena)
+	assert(test_arena.has_node("GameCompletionScreen"), "GameArena must contain GameCompletionScreen node")
+	assert(test_arena.game_completion_screen != null, "GameArena must reference game_completion_screen")
+	
+	# Test stage clear routing on non-final track vs final track
+	GameManager.current_track_info = GameManager.tracks_list[0]
+	test_arena._on_stage_cleared()
+	assert(test_arena.victory_screen.visible == true, "Non-final stage must route to VictoryScreen")
+	assert(test_arena.game_completion_screen.visible == false, "Non-final stage must NOT route to GameCompletionScreen")
+	test_arena.victory_screen.visible = false
+	
+	GameManager.current_track_info = GameManager.tracks_list.back()
+	test_arena._on_stage_cleared()
+	assert(test_arena.game_completion_screen.visible == true, "Final stage must route to GameCompletionScreen")
+	print("✓ GameArena completion routing verified (intermediate -> VictoryScreen, final -> GameCompletionScreen)")
+	
+	test_arena.queue_free()
+	comp_inst.queue_free()
+	get_tree().paused = false
+	
 	print("\n--- ALL TESTS PASSED SUCCESSFULLY ---")
 	get_tree().quit(0)
 

@@ -94,13 +94,21 @@ func _generate_fallback_amplitude_metadata(title: String, path: String) -> Dicti
 		"secondary_color": [1.0, 0.08, 0.58, 1.0],
 		"ambient_color": [0.03, 0.02, 0.08, 1.0],
 	}
-	
-	# If no save yet, default unlock the first track (e.g. Armageddon / Olympus Mainframe)
-	if tracks_list.size() > 0 and unlocked_tracks.is_empty():
-		unlocked_tracks.append(tracks_list[0]["title"])
 
 func is_track_unlocked(track_title: String) -> bool:
 	return track_title in unlocked_tracks
+
+func is_final_track(track_title: String) -> bool:
+	if tracks_list.is_empty():
+		return false
+	return tracks_list.back()["title"] == track_title
+
+func is_game_completed() -> bool:
+	if tracks_list.is_empty():
+		return false
+	var final_title = tracks_list.back()["title"]
+	var record = high_scores.get(final_title, {})
+	return record is Dictionary and record.get("cleared", false) == true
 
 func get_next_track(current_title: String) -> Dictionary:
 	for i in range(tracks_list.size()):
@@ -127,10 +135,11 @@ func record_run_result(track_title: String, survival_time: float, kills: int, cl
 		if not track_title in unlocked_tracks:
 			unlocked_tracks.append(track_title)
 		
-		# Unlock next track in sequence
-		var next_track = get_next_track(track_title)
-		if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
-			unlocked_tracks.append(next_track["title"])
+		# Unlock next track in sequence if not at the final track
+		if not is_final_track(track_title):
+			var next_track = get_next_track(track_title)
+			if not next_track.is_empty() and not next_track["title"] in unlocked_tracks:
+				unlocked_tracks.append(next_track["title"])
 	
 	high_scores[track_title] = {
 		"best_time": max(prev_time, survival_time),
@@ -200,6 +209,24 @@ func get_total_kills() -> int:
 			total += int(data.get("kills", 0))
 	return total
 
+func has_beaten_any_level() -> bool:
+	for title in high_scores.keys():
+		var data = high_scores[title]
+		if data is Dictionary and data.get("cleared", false) == true:
+			return true
+	return false
+
+func reset_game_data() -> void:
+	if FileAccess.file_exists(SAVE_PATH):
+		DirAccess.remove_absolute(SAVE_PATH)
+	high_scores.clear()
+	unlocked_tracks.clear()
+	if tracks_list.size() > 0:
+		unlocked_tracks.append(tracks_list[0]["title"])
+	player_kills = 0
+	player_damage_dealt = 0.0
+	run_elapsed_time = 0.0
+
 func save_game_data() -> void:
 	var data = {
 		"unlocked_tracks": unlocked_tracks,
@@ -211,6 +238,8 @@ func save_game_data() -> void:
 
 func load_save_data() -> void:
 	if not FileAccess.file_exists(SAVE_PATH):
+		if tracks_list.size() > 0 and not tracks_list[0]["title"] in unlocked_tracks:
+			unlocked_tracks.append(tracks_list[0]["title"])
 		return
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file:
