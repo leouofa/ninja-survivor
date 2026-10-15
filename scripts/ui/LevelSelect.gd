@@ -38,7 +38,7 @@ func _create_track_row(index: int, track: Dictionary, unlocked: bool, stats: Dic
 	panel.add_child(margin)
 	
 	var hbox = HBoxContainer.new()
-	hbox.theme_override_constants/separation = 16
+	hbox.add_theme_constant_override("separation", 16)
 	margin.add_child(hbox)
 	
 	# Number label
