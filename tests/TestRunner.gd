@@ -135,12 +135,11 @@ func _ready() -> void:
 	assert(is_equal_approx(h_hill, h_hill2), "Heights must be identical for same track seed")
 	print("✓ Seed idempotence verified (identical heights across runs: %f == %f)" % [h_hill, h_hill2])
 	
-	# Verify ConcavePolygonShape3D collision
+	# Verify native solid HeightMapShape3D collision
 	assert(col1.shape != null, "Floor collision shape must not be null")
-	assert(col1.shape is ConcavePolygonShape3D, "Collision shape must be ConcavePolygonShape3D")
-	var faces = col1.shape.get_faces()
-	assert(faces.size() > 0, "ConcavePolygonShape3D faces must not be empty")
-	print("✓ 3D ConcavePolygonShape3D physics collision verified with %d faces" % (faces.size() / 3))
+	assert(col1.shape is HeightMapShape3D, "Collision shape must be HeightMapShape3D")
+	assert(col1.shape.map_data.size() > 0, "HeightMapShape3D map_data must not be empty")
+	print("✓ Native solid HeightMapShape3D physics collision verified (%dx%d)" % [col1.shape.map_width, col1.shape.map_depth])
 	
 	# 5. Test Audio Reactivity Uniform Updates
 	assert(floor_node1.floor_material != null, "Shader material must exist on floor")
@@ -173,7 +172,7 @@ func _ready() -> void:
 	floor_node2.queue_free()
 	player.queue_free()
 	
-	# 7. Test Full GameArena Scene Instantiation & Player Ground Support
+	# 7. Test Full GameArena Scene Instantiation, HeightMapShape3D & Real Physics
 	var arena_scene = load("res://scenes/game/GameArena.tscn")
 	assert(arena_scene != null, "GameArena.tscn failed to load")
 	var arena = arena_scene.instantiate()
@@ -183,6 +182,18 @@ func _ready() -> void:
 	var arena_ground = arena.get_node("Ground")
 	var ground_mesh = arena_ground.get_node("MeshInstance3D").mesh
 	assert(ground_mesh != null, "GameArena procedural ground mesh must exist")
+	
+	# Verify HeightMapShape3D collision
+	var hms_shape = arena_ground.get_node("CollisionShape3D").shape
+	assert(hms_shape is HeightMapShape3D, "Floor collision shape must be HeightMapShape3D")
+	assert(hms_shape.map_width == 161 and hms_shape.map_depth == 161, "HeightMapShape3D resolution must be 161x161")
+	print("✓ Native solid HeightMapShape3D verified (161x161 resolution, 1m/sample)")
+	
+	# Verify underground safety foundation
+	var safety_col = arena_ground.find_child("SafetyFloorCollision", false, false)
+	assert(safety_col != null, "SafetyFloorCollision node must exist")
+	assert(safety_col.shape is BoxShape3D, "Safety collision shape must be BoxShape3D")
+	print("✓ Underground solid safety foundation verified (4m thick BoxShape3D)")
 	
 	# Verify upward normal on ground faces
 	var arena_faces = ground_mesh.get_faces()
@@ -196,13 +207,19 @@ func _ready() -> void:
 	# Verify player collision mask includes ground
 	assert((arena_player.collision_mask & 1) != 0, "Player collision mask must include layer 1 (Ground)")
 	
-	# Run 20 physics frames on the arena
-	for f in range(20):
-		arena_player._physics_process(0.016)
+	# Run 80 real physics frames across engine updates
+	var opening_enemies_seen = false
+	for f in range(80):
+		await get_tree().physics_frame
+		var enemies = get_tree().get_nodes_in_group("enemies")
+		if not enemies.is_empty():
+			opening_enemies_seen = true
+		assert(arena_player.global_position.y >= -0.2, "Player must not fall through terrain! Tick %d, y: %f" % [f, arena_player.global_position.y])
 		
-	# Verify player has settled cleanly on the ground (around y = 0) and not fallen into the void
-	assert(arena_player.global_position.y >= -0.2, "Player must not fall through terrain! Current y: %f" % arena_player.global_position.y)
-	print("✓ Player grounded stably on procedural terrain at y = %f" % arena_player.global_position.y)
+	assert(opening_enemies_seen, "Immediate opening wave of enemies must spawn on level start")
+	assert(arena_player.is_on_floor(), "Player must be stably grounded on floor")
+	print("✓ Player grounded stably on procedural terrain at y = %f (on_floor: %s)" % [arena_player.global_position.y, arena_player.is_on_floor()])
+	print("✓ Immediate opening enemy wave verified on screen from start")
 	
 	arena.queue_free()
 	

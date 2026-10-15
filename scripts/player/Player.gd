@@ -89,7 +89,7 @@ func _physics_process(delta: float) -> void:
 	
 	# Gravity & floor stick
 	if not is_on_floor():
-		velocity.y -= GRAVITY * delta
+		velocity.y = max(velocity.y - GRAVITY * delta, -25.0)
 	else:
 		velocity.y = -0.5
 	
@@ -102,6 +102,7 @@ func _physics_process(delta: float) -> void:
 		velocity = last_movement_dir * dash_speed
 		velocity.y = y_vel
 		move_and_slide()
+		_enforce_ground_height()
 		return
 	
 	# Normal movement
@@ -139,6 +140,15 @@ func _physics_process(delta: float) -> void:
 		_trigger_dash()
 	
 	move_and_slide()
+	_enforce_ground_height()
+
+func _enforce_ground_height() -> void:
+	var floor_nodes = get_tree().get_nodes_in_group("procedural_floor")
+	if not floor_nodes.is_empty():
+		var gh = floor_nodes[0].get_height_at(global_position.x, global_position.z)
+		if global_position.y < gh - 0.15:
+			global_position.y = gh + 0.02
+			velocity.y = 0.0
 
 func _trigger_dash() -> void:
 	is_dashing = true

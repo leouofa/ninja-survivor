@@ -2,7 +2,7 @@ extends StaticBody3D
 class_name ProceduralFloor
 
 @export var arena_size: float = 160.0
-@export var subdivisions: int = 80
+@export var subdivisions: int = 160
 @export var default_height_scale: float = 2.0
 @export var default_voronoi_scale: float = 0.05
 
@@ -70,13 +70,41 @@ func generate_floor(track_info: Dictionary) -> void:
 	var generated_mesh = _build_terrain_mesh()
 	mesh_instance.mesh = generated_mesh
 	
-	# Generate matching ConcavePolygonShape3D
-	var shape = generated_mesh.create_trimesh_shape()
-	collision_shape.shape = shape
+	# Generate native solid HeightMapShape3D
+	var hms = _build_heightmap_shape()
+	collision_shape.shape = hms
+	collision_shape.scale = Vector3.ONE
 	collision_shape.transform = Transform3D.IDENTITY
+	
+	# Attach underground safety foundation box
+	var safety_node = find_child("SafetyFloorCollision", false, false)
+	if safety_node == null:
+		safety_node = CollisionShape3D.new()
+		safety_node.name = "SafetyFloorCollision"
+		var sbox = BoxShape3D.new()
+		sbox.size = Vector3(arena_size, 4.0, arena_size)
+		safety_node.shape = sbox
+		safety_node.position = Vector3(0, -2.0, 0)
+		add_child(safety_node)
 	
 	# Setup custom cyber floor shader material
 	_setup_shader_material(track_info)
+
+func _build_heightmap_shape() -> HeightMapShape3D:
+	var hms = HeightMapShape3D.new()
+	hms.map_width = subdivisions + 1
+	hms.map_depth = subdivisions + 1
+	var data = PackedFloat32Array()
+	data.resize((subdivisions + 1) * (subdivisions + 1))
+	var half_sz = arena_size * 0.5
+	var step = arena_size / float(subdivisions)
+	for j in range(subdivisions + 1):
+		var z = -half_sz + float(j) * step
+		for i in range(subdivisions + 1):
+			var x = -half_sz + float(i) * step
+			data[j * (subdivisions + 1) + i] = get_height_at(x, z)
+	hms.map_data = data
+	return hms
 
 func get_height_at(x: float, z: float) -> float:
 	if noise == null:

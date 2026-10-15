@@ -7,7 +7,7 @@ var enemy_base_script = preload("res://scripts/enemies/BaseEnemy.gd")
 
 var spawn_timer: float = 0.0
 var base_spawn_interval: float = 1.4
-var spawn_radius: float = 24.0
+var spawn_radius: float = 18.0
 
 var boss_has_spawned: bool = false
 var stage_finished: bool = false
@@ -19,6 +19,20 @@ func _ready() -> void:
 	var players = get_tree().get_nodes_in_group("player")
 	if not players.is_empty():
 		player = players[0]
+	call_deferred("_spawn_opening_wave")
+
+func _spawn_opening_wave() -> void:
+	if not is_instance_valid(player):
+		var players = get_tree().get_nodes_in_group("player")
+		if not players.is_empty():
+			player = players[0]
+	if not is_instance_valid(player):
+		return
+	for i in range(4):
+		var angle = float(i) * (TAU / 4.0) + randf_range(-0.2, 0.2)
+		var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * 13.0
+		spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
+		_spawn_enemy_at("ronin", spawn_pos)
 
 func _process(delta: float) -> void:
 	if stage_finished:
@@ -85,7 +99,9 @@ func _spawn_enemy(type: String) -> void:
 	var angle = randf() * TAU
 	var spawn_pos = player.global_position + Vector3(cos(angle), 0, sin(angle)) * spawn_radius
 	spawn_pos.y = _get_ground_height(spawn_pos.x, spawn_pos.z) + 0.1
-	
+	_spawn_enemy_at(type, spawn_pos)
+
+func _spawn_enemy_at(type: String, spawn_pos: Vector3) -> void:
 	var enemy = CharacterBody3D.new()
 	enemy.set_script(enemy_base_script)
 	enemy.enemy_type = type

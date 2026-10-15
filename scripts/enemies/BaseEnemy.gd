@@ -107,6 +107,15 @@ func _physics_process(delta: float) -> void:
 		velocity.y = y_vel
 	
 	move_and_slide()
+	_enforce_ground_height()
+
+func _enforce_ground_height() -> void:
+	var floor_nodes = get_tree().get_nodes_in_group("procedural_floor")
+	if not floor_nodes.is_empty():
+		var gh = floor_nodes[0].get_height_at(global_position.x, global_position.z)
+		if global_position.y < gh - 0.15:
+			global_position.y = gh + 0.02
+			velocity.y = 0.0
 
 func take_damage(amount: float, knock_dir: Vector3 = Vector3.ZERO) -> void:
 	if is_dying:
