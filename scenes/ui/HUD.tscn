@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://hud_scene_01"]
+[gd_scene load_steps=7 format=3 uid="uid://hud_scene_01"]
 
 [ext_resource type="Script" path="res://scripts/ui/HUD.gd" id="1_hud"]
 
@@ -23,8 +23,15 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_track_fill"]
 bg_color = Color(0, 0.9, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_xp_fill"]
+bg_color = Color(0.05, 0.95, 0.45, 1)
 corner_radius_top_left = 4
 corner_radius_top_right = 4
 corner_radius_bottom_right = 4
@@ -66,7 +73,7 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_xp_bg")
-theme_override_styles/fill = SubResource("StyleBoxFlat_xp_fill")
+theme_override_styles/fill = SubResource("StyleBoxFlat_track_fill")
 value = 50.0
 show_percentage = false
 
@@ -108,7 +115,7 @@ layout_mode = 2
 
 [node name="LevelLabel" type="Label" parent="MarginContainer/BottomLeft/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0, 1, 1, 1)
+theme_override_colors/font_color = Color(0.1, 1.0, 0.5, 1)
 theme_override_font_sizes/font_size = 18
 text = "LEVEL 1"
 
