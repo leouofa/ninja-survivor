@@ -85,6 +85,17 @@ void fragment() {
 	float ripple_wave = sin(dist_from_center * 0.35 - wave_time) * 0.5 + 0.5;
 	float beat_ripple = smoothstep(0.70, 0.98, ripple_wave) * (0.2 + live_amplitude * 1.5);
 
+	// Audio-reactive emission modulation
+	float pulse = live_amplitude * 1.2;
+
+	// Outer boundary warning strip (approaching edge at 70m to 78m)
+	float edge_dist = max(abs(world_pos.x), abs(world_pos.z));
+	float hazard_zone = smoothstep(70.0, 78.0, edge_dist);
+	float hazard_stripes = sin((world_pos.x + world_pos.z) * 1.5 - TIME * 3.0) * 0.5 + 0.5;
+	float hazard_border = smoothstep(76.5, 78.0, edge_dist);
+	float hazard_intensity = (hazard_border * 0.9 + hazard_zone * hazard_stripes * 0.35) * (0.6 + pulse * 0.8);
+	vec3 hazard_emission = secondary_color.rgb * hazard_intensity;
+
 	// Base Albedo: visible cybernetic dark slate / carbon tiles with subtle ambient tone
 	vec3 base_tile = ambient_color.rgb * 1.8 + vec3(0.035, 0.035, 0.05);
 	vec3 cell_color = mix(base_tile, primary_color.rgb * 0.14, cell_id * 0.6);
@@ -92,12 +103,10 @@ void fragment() {
 
 	// Grid tinting on albedo
 	vec3 final_albedo = mix(cell_color, primary_color.rgb * 0.45, grid_lines * 0.6);
+	final_albedo = mix(final_albedo, secondary_color.rgb * 0.25, hazard_zone * 0.4);
 	ALBEDO = final_albedo;
 	METALLIC = panel_metallic;
 	ROUGHNESS = mix(panel_roughness, 0.15, max(border, grid_lines));
-
-	// Audio-reactive emission modulation
-	float pulse = live_amplitude * 1.2;
 
 	// 1. Glowing Voronoi Seams
 	vec3 seam_emission = primary_color.rgb * border * (0.6 + pulse * 1.0);
@@ -114,5 +123,5 @@ void fragment() {
 	// 5. Beat Ripple Waves
 	vec3 ripple_emission = secondary_color.rgb * beat_ripple * (0.2 + pulse * 0.6);
 
-	EMISSION = (seam_emission + grid_emission + ring_emission + contour_emission + ripple_emission) * emission_energy;
+	EMISSION = (seam_emission + grid_emission + ring_emission + contour_emission + ripple_emission + hazard_emission) * emission_energy;
 }

@@ -107,7 +107,14 @@ func _physics_process(delta: float) -> void:
 		velocity.y = y_vel
 	
 	move_and_slide()
+	_enforce_map_bounds()
 	_enforce_ground_height()
+
+const MAP_BOUNDARY_LIMIT: float = 78.5
+
+func _enforce_map_bounds() -> void:
+	global_position.x = clamp(global_position.x, -MAP_BOUNDARY_LIMIT, MAP_BOUNDARY_LIMIT)
+	global_position.z = clamp(global_position.z, -MAP_BOUNDARY_LIMIT, MAP_BOUNDARY_LIMIT)
 
 func _enforce_ground_height() -> void:
 	var floor_nodes = get_tree().get_nodes_in_group("procedural_floor")

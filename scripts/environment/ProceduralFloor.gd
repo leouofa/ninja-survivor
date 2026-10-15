@@ -87,8 +87,29 @@ func generate_floor(track_info: Dictionary) -> void:
 		safety_node.position = Vector3(0, -2.0, 0)
 		add_child(safety_node)
 	
+	# Attach perimeter boundary barrier walls
+	_build_boundary_walls()
+	
 	# Setup custom cyber floor shader material
 	_setup_shader_material(track_info)
+
+func _build_boundary_walls() -> void:
+	var wall_configs = [
+		{"name": "BoundaryWallNorth", "pos": Vector3(0.0, 8.0, -80.0), "size": Vector3(168.0, 20.0, 4.0)},
+		{"name": "BoundaryWallSouth", "pos": Vector3(0.0, 8.0, 80.0), "size": Vector3(168.0, 20.0, 4.0)},
+		{"name": "BoundaryWallEast", "pos": Vector3(80.0, 8.0, 0.0), "size": Vector3(4.0, 20.0, 168.0)},
+		{"name": "BoundaryWallWest", "pos": Vector3(-80.0, 8.0, 0.0), "size": Vector3(4.0, 20.0, 168.0)},
+	]
+	for cfg in wall_configs:
+		var wall = find_child(cfg.name, false, false)
+		if wall == null:
+			wall = CollisionShape3D.new()
+			wall.name = cfg.name
+			var box = BoxShape3D.new()
+			box.size = cfg.size
+			wall.shape = box
+			wall.position = cfg.pos
+			add_child(wall)
 
 func _build_heightmap_shape() -> HeightMapShape3D:
 	var hms = HeightMapShape3D.new()

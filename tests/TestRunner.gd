@@ -171,6 +171,7 @@ func _ready() -> void:
 	floor_node1.queue_free()
 	floor_node2.queue_free()
 	player.queue_free()
+	await get_tree().process_frame
 	
 	# 7. Test Full GameArena Scene Instantiation, HeightMapShape3D & Real Physics
 	var arena_scene = load("res://scenes/game/GameArena.tscn")
@@ -220,6 +221,57 @@ func _ready() -> void:
 	assert(arena_player.is_on_floor(), "Player must be stably grounded on floor")
 	print("✓ Player grounded stably on procedural terrain at y = %f (on_floor: %s)" % [arena_player.global_position.y, arena_player.is_on_floor()])
 	print("✓ Immediate opening enemy wave verified on screen from start")
+	
+	print("\n--- BEGIN TEST: Arena Boundary Confinement ---")
+	
+	# Verify all 4 boundary barrier collision walls exist on arena_ground
+	var wall_north = arena_ground.find_child("BoundaryWallNorth", false, false)
+	var wall_south = arena_ground.find_child("BoundaryWallSouth", false, false)
+	var wall_east = arena_ground.find_child("BoundaryWallEast", false, false)
+	var wall_west = arena_ground.find_child("BoundaryWallWest", false, false)
+	
+	assert(wall_north != null and wall_north.shape is BoxShape3D, "BoundaryWallNorth must exist with BoxShape3D")
+	assert(wall_south != null and wall_south.shape is BoxShape3D, "BoundaryWallSouth must exist with BoxShape3D")
+	assert(wall_east != null and wall_east.shape is BoxShape3D, "BoundaryWallEast must exist with BoxShape3D")
+	assert(wall_west != null and wall_west.shape is BoxShape3D, "BoundaryWallWest must exist with BoxShape3D")
+	print("✓ 4 perimeter boundary collision walls verified (North, South, East, West)")
+	
+	# Test high-speed dash towards boundaries in all 4 cardinal directions & corner
+	var test_vectors = [
+		{"name": "East (+X)", "start": Vector3(75.0, 0.0, 0.0), "dir": Vector3(1, 0, 0)},
+		{"name": "West (-X)", "start": Vector3(-75.0, 0.0, 0.0), "dir": Vector3(-1, 0, 0)},
+		{"name": "South (+Z)", "start": Vector3(0.0, 0.0, 75.0), "dir": Vector3(0, 0, 1)},
+		{"name": "North (-Z)", "start": Vector3(0.0, 0.0, -75.0), "dir": Vector3(0, 0, -1)},
+		{"name": "Corner (+X, +Z)", "start": Vector3(75.0, 0.0, 75.0), "dir": Vector3(1, 0, 1).normalized()},
+	]
+	
+	for tv in test_vectors:
+		arena_player.global_position = tv.start
+		arena_player.last_movement_dir = tv.dir
+		arena_player.velocity = tv.dir * 40.0 # Extreme speed (40 m/s)
+		arena_player.is_dashing = true
+		arena_player.dash_timer = 0.5
+		
+		for _step in range(20):
+			await get_tree().physics_frame
+			assert(abs(arena_player.global_position.x) <= 78.501, "Player breached X boundary: %s at %s" % [tv.name, arena_player.global_position])
+			assert(abs(arena_player.global_position.z) <= 78.501, "Player breached Z boundary: %s at %s" % [tv.name, arena_player.global_position])
+			assert(arena_player.global_position.y >= -0.5, "Player fell off boundary terrain: %s at %s" % [tv.name, arena_player.global_position])
+		
+		print("✓ Boundary confinement verified: %s (final pos: %s)" % [tv.name, arena_player.global_position])
+	
+	# Verify enemy spawn boundary confinement
+	var spawner = arena.get_node("EnemySpawner")
+	assert(spawner != null, "EnemySpawner must exist")
+	# Force spawn an enemy when player is at edge
+	arena_player.global_position = Vector3(78.0, 0.0, 78.0)
+	for i in range(10):
+		spawner._spawn_enemy("ronin")
+	var spawned_enemies = get_tree().get_nodes_in_group("enemies")
+	for e in spawned_enemies:
+		assert(abs(e.global_position.x) <= 74.5, "Enemy spawned out of bounds X: %s" % e.global_position)
+		assert(abs(e.global_position.z) <= 74.5, "Enemy spawned out of bounds Z: %s" % e.global_position)
+	print("✓ Enemy spawn boundary clamping verified (%d enemies tested within ±74m)" % spawned_enemies.size())
 	
 	arena.queue_free()
 	
