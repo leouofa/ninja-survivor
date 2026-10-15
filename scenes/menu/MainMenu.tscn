@@ -71,6 +71,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "MISSION SELECT (36 TRACKS)"
 
+[node name="HighScoresBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
+custom_minimum_size = Vector2(0, 52)
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "HIGH SCORES"
+
 [node name="QuitBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
