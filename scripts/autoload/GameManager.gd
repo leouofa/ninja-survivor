@@ -31,6 +31,11 @@ func _ready() -> void:
 
 func load_amplitude_manifest() -> void:
 	amplitude_manifest.clear()
+	if ResourceLoader.exists(MANIFEST_PATH):
+		var json_res = load(MANIFEST_PATH)
+		if json_res is JSON and json_res.data is Dictionary:
+			amplitude_manifest = json_res.data
+			return
 	if FileAccess.file_exists(MANIFEST_PATH):
 		var file = FileAccess.open(MANIFEST_PATH, FileAccess.READ)
 		if file:
@@ -39,38 +44,78 @@ func load_amplitude_manifest() -> void:
 			if parsed is Dictionary:
 				amplitude_manifest = parsed
 
-func load_all_tracks() -> void:
-	tracks_list.clear()
+static func _extract_mp3_filename(entry_name: String) -> String:
+	var clean_name = entry_name
+	if clean_name.ends_with(".remap"):
+		clean_name = clean_name.trim_suffix(".remap")
+	elif clean_name.ends_with(".import"):
+		clean_name = clean_name.trim_suffix(".import")
+	if clean_name.ends_with(".mp3"):
+		return clean_name
+	return ""
+
+func _discover_track_files() -> Array[String]:
+	var seen: Dictionary = {}
+	var result: Array[String] = []
+	
+	if ResourceLoader.has_method("list_directory"):
+		var entries = ResourceLoader.list_directory("res://tracks")
+		for entry in entries:
+			var mp3_name = _extract_mp3_filename(str(entry))
+			if mp3_name != "" and not seen.has(mp3_name):
+				seen[mp3_name] = true
+				result.append(mp3_name)
+	
 	var dir = DirAccess.open("res://tracks")
 	if dir:
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		while file_name != "":
-			if not dir.current_is_dir() and file_name.ends_with(".mp3"):
-				var track_title = file_name.trim_suffix(".mp3")
-				var full_path = "res://tracks/" + file_name
-				var meta = amplitude_manifest.get(track_title, null)
-				if meta == null:
-					meta = _generate_fallback_amplitude_metadata(track_title, full_path)
-				
-				tracks_list.append({
-					"title": track_title,
-					"file_name": file_name,
-					"path": full_path,
-					"seed": int(meta.get("seed", hash(track_title) & 0x7FFFFFFF)),
-					"rms_db": float(meta.get("rms_db", -16.0)),
-					"max_db": float(meta.get("max_db", 0.0)),
-					"dynamic_range_db": float(meta.get("dynamic_range_db", 16.0)),
-					"normalized_energy": float(meta.get("normalized_energy", 0.5)),
-					"height_scale": float(meta.get("height_scale", 1.9)),
-					"voronoi_scale": float(meta.get("voronoi_scale", 0.05)),
-					"palette_name": str(meta.get("palette_name", "Neon Cyan & Magenta")),
-					"primary_color": meta.get("primary_color", [0.0, 0.95, 1.0, 1.0]),
-					"secondary_color": meta.get("secondary_color", [1.0, 0.08, 0.58, 1.0]),
-					"ambient_color": meta.get("ambient_color", [0.03, 0.02, 0.08, 1.0]),
-				})
+			if not dir.current_is_dir():
+				var mp3_name = _extract_mp3_filename(file_name)
+				if mp3_name != "" and not seen.has(mp3_name):
+					seen[mp3_name] = true
+					result.append(mp3_name)
 			file_name = dir.get_next()
 		dir.list_dir_end()
+	
+	if not amplitude_manifest.is_empty():
+		for track_title in amplitude_manifest.keys():
+			var meta = amplitude_manifest[track_title]
+			var mp3_name = str(meta.get("file_name", str(track_title) + ".mp3")) if meta is Dictionary else (str(track_title) + ".mp3")
+			var full_path = "res://tracks/" + mp3_name
+			if not seen.has(mp3_name) and ResourceLoader.exists(full_path):
+				seen[mp3_name] = true
+				result.append(mp3_name)
+	
+	return result
+
+func load_all_tracks() -> void:
+	tracks_list.clear()
+	var track_files = _discover_track_files()
+	for file_name in track_files:
+		var track_title = file_name.trim_suffix(".mp3")
+		var full_path = "res://tracks/" + file_name
+		var meta = amplitude_manifest.get(track_title, null)
+		if meta == null:
+			meta = _generate_fallback_amplitude_metadata(track_title, full_path)
+		
+		tracks_list.append({
+			"title": track_title,
+			"file_name": file_name,
+			"path": full_path,
+			"seed": int(meta.get("seed", hash(track_title) & 0x7FFFFFFF)),
+			"rms_db": float(meta.get("rms_db", -16.0)),
+			"max_db": float(meta.get("max_db", 0.0)),
+			"dynamic_range_db": float(meta.get("dynamic_range_db", 16.0)),
+			"normalized_energy": float(meta.get("normalized_energy", 0.5)),
+			"height_scale": float(meta.get("height_scale", 1.9)),
+			"voronoi_scale": float(meta.get("voronoi_scale", 0.05)),
+			"palette_name": str(meta.get("palette_name", "Neon Cyan & Magenta")),
+			"primary_color": meta.get("primary_color", [0.0, 0.95, 1.0, 1.0]),
+			"secondary_color": meta.get("secondary_color", [1.0, 0.08, 0.58, 1.0]),
+			"ambient_color": meta.get("ambient_color", [0.03, 0.02, 0.08, 1.0]),
+		})
 	
 	# Sort tracks alphabetically for consistent level order
 	tracks_list.sort_custom(func(a, b): return a["title"] < b["title"])

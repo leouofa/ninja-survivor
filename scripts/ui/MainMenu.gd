@@ -21,6 +21,10 @@ func _ready() -> void:
 	select_btn.disabled = not has_beaten_levels
 	high_scores_btn.disabled = not has_beaten_levels
 	
+	if GameManager.tracks_list.is_empty():
+		GameManager.load_amplitude_manifest()
+		GameManager.load_all_tracks()
+	
 	# Start ambient title synth music if not playing
 	if not AudioManager.music_player.playing:
 		if not GameManager.tracks_list.is_empty():
@@ -28,6 +32,9 @@ func _ready() -> void:
 			AudioManager.play_track(GameManager.tracks_list[0]["path"])
 
 func _on_start_pressed() -> void:
+	if GameManager.tracks_list.is_empty():
+		GameManager.load_amplitude_manifest()
+		GameManager.load_all_tracks()
 	# Find first uncleared track or first track
 	var target_track = GameManager.tracks_list[0] if not GameManager.tracks_list.is_empty() else {}
 	for t in GameManager.tracks_list:

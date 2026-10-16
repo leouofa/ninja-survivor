@@ -1,9 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://main_menu_01"]
+[gd_scene format=3 uid="uid://2hg4ko32o3f3"]
 
-[ext_resource type="Script" path="res://scripts/ui/MainMenu.gd" id="1_mainmenu"]
-[ext_resource type="PackedScene" uid="uid://synthwave_bg_01" path="res://scenes/ui/SynthwaveBackground.tscn" id="2_synthwave_bg"]
+[ext_resource type="Script" uid="uid://5a8llvdw4iit" path="res://scripts/ui/MainMenu.gd" id="1_mainmenu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/SynthwaveBackground.tscn" id="2_synthwave_bg"]
 
-[node name="MainMenu" type="Control"]
+[node name="MainMenu" type="Control" unique_id=1897569015]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -12,10 +12,10 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_mainmenu")
 
-[node name="SynthwaveBackground" parent="." instance=ExtResource("2_synthwave_bg")]
+[node name="SynthwaveBackground" parent="." unique_id=462930957 instance=ExtResource("2_synthwave_bg")]
 layout_mode = 1
 
-[node name="CenterContainer" type="CenterContainer" parent="."]
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=967237445]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -23,17 +23,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=532534490]
 custom_minimum_size = Vector2(480, 0)
 layout_mode = 2
 theme_override_constants/separation = 32
 alignment = 1
 
-[node name="Header" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+[node name="Header" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1738804995]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/Header"]
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer/Header" unique_id=473517401]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 1, 1, 1)
 theme_override_colors/font_shadow_color = Color(1, 0, 0.5, 1)
@@ -43,36 +43,36 @@ theme_override_font_sizes/font_size = 56
 text = "NINJA SURVIVOR"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer/Header"]
+[node name="Subtitle" type="Label" parent="CenterContainer/VBoxContainer/Header" unique_id=1524513968]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.1, 0.6, 1)
 theme_override_font_sizes/font_size = 20
 text = "— CYBER-YOKAI PROTOCOL —"
 horizontal_alignment = 1
 
-[node name="VBoxButtons" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+[node name="VBoxButtons" type="VBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=1617887559]
 layout_mode = 2
 theme_override_constants/separation = 16
 
-[node name="StartBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
+[node name="StartBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons" unique_id=36201288]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "START CAMPAIGN"
 
-[node name="SelectBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
+[node name="SelectBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons" unique_id=1395539165]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "MISSION SELECT (36 TRACKS)"
 
-[node name="HighScoresBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
+[node name="HighScoresBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons" unique_id=208433391]
 custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "HIGH SCORES"
 
-[node name="QuitBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons"]
+[node name="QuitBtn" type="Button" parent="CenterContainer/VBoxContainer/VBoxButtons" unique_id=385298713]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
