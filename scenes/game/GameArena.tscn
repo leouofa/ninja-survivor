@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://game_arena_01"]
 
 [ext_resource type="Script" path="res://scripts/game/GameArena.gd" id="1_arena"]
-[ext_resource type="PackedScene" uid="uid://player_ninja_01" path="res://scenes/player/Player.tscn" id="2_player"]
+[ext_resource type="PackedScene" uid="uid://bapvh0ej3y88o" path="res://scenes/player/Player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/player/PlayerCamera.gd" id="3_camera"]
 [ext_resource type="Script" path="res://scripts/enemies/EnemySpawner.gd" id="4_spawner"]
 [ext_resource type="PackedScene" uid="uid://hud_scene_01" path="res://scenes/ui/HUD.tscn" id="5_hud"]

@@ -93,7 +93,11 @@ func _ready() -> void:
 			found_old = true
 	assert(found_renamed, "'Immortals Ain’t Bulletproof (Remix)' must be present in tracks_list")
 	assert(not found_old, "'Immortal Ain’t Bulletproof' must no longer exist in tracks_list")
-	print("✓ Track rename verified: 'Immortals Ain’t Bulletproof (Remix)' correctly loaded with manifest metadata")
+	assert(GameManager._extract_mp3_filename("Armageddon.mp3.remap") == "Armageddon.mp3", "Must extract .mp3 filename from .remap entry in exported builds")
+	assert(GameManager._extract_mp3_filename("Armageddon.mp3.import") == "Armageddon.mp3", "Must extract .mp3 filename from .import entry")
+	assert(GameManager._extract_mp3_filename("Armageddon.mp3") == "Armageddon.mp3", "Must preserve direct .mp3 filename")
+	assert(GameManager._extract_mp3_filename(".DS_Store") == "", "Must ignore non-mp3 files")
+	print("✓ Track rename and exported build (.remap/.import) track discovery verified")
 
 	# 4. Test Procedural Floor Generation & Idempotence
 	var floor_script = load("res://scripts/environment/ProceduralFloor.gd")
